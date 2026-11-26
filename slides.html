@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which Place Has the Most Homelessness? Slides</title>
+<style>
+:root{--bg:#f6f4ee;--ink:#1d2b36;--muted:#44525c;--accent:#0b5c6b;--card:#ffffff;--line:#c9d3d6;--hl:#fff3cf}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.slide{display:none;min-height:100vh;padding:5vh 7vw 9vh;flex-direction:column;justify-content:center;gap:2.2vh}
+.slide.active{display:flex}
+h1{font-size:clamp(2rem,5.2vw,4rem);line-height:1.15;margin:0;color:var(--accent)}
+h2{font-size:clamp(1.7rem,3.8vw,2.9rem);line-height:1.2;margin:0;color:var(--accent)}
+p,li{font-size:clamp(1.15rem,2.4vw,1.9rem);line-height:1.45;margin:0}
+ul,ol{margin:0;padding-left:1.3em;display:grid;gap:1.1vh}
+.sub{color:var(--muted)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:2.2vh 2.4vw}
+.big{font-size:clamp(1.5rem,3.4vw,2.6rem);font-weight:700}
+.hl{background:var(--hl);border-radius:6px;padding:0 .3em}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:2vw}
+.src{font-size:clamp(.95rem,1.6vw,1.2rem);color:var(--muted)}
+.targets li{font-size:clamp(1.05rem,2.1vw,1.6rem)}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:1.2vh 2vw;background:var(--card);border-top:2px solid var(--line);font-size:1rem;color:var(--muted)}
+#bar button{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--accent);border-radius:8px;padding:.35em .9em;cursor:pointer}
+#bar button:focus-visible{outline:3px solid #000;outline-offset:2px}
+#notes{display:none;position:fixed;left:0;right:0;bottom:3.6rem;max-height:42vh;overflow:auto;background:#10242c;color:#f4f7f8;padding:1.2rem 2vw;font-size:1.1rem;line-height:1.5;border-top:4px solid var(--accent)}
+#notes.on{display:block}
+@media print{.slide{display:flex;page-break-after:always;min-height:0;height:100vh}#bar,#notes{display:none!important}}
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<section class="slide active" aria-label="Slide 1 of 6">
+  <p class="sub">Lesson 1</p>
+  <h1>Which place has the most homelessness?</h1>
+  <p class="big">How would you decide? What numbers would you need?</p>
+  <p class="sub">Today: real numbers from HUD and the U.S. Census Bureau.</p>
+  <!-- NOTES 1: Read the question aloud. Take two or three quick answers; do not say which is right. Tell students they will commit to an answer from raw counts first, then test it. Remind them: we say "people experiencing homelessness." -->
+  <div class="notes-src" hidden>Read the question aloud. Take two or three quick answers; do not say which is right. Tell students they will commit to an answer from raw counts first, then test it. Remind them we say "people experiencing homelessness."</div>
+</section>
+
+<!-- SLIDE 2 -->
+<section class="slide" aria-label="Slide 2 of 6">
+  <h2>What is a Point-in-Time (PIT) count?</h2>
+  <ul>
+    <li>A count of people experiencing homelessness on <span class="hl">one night</span> in late January.</li>
+    <li>It counts people <b>in shelter or transitional housing</b> and people <b>staying outside</b> or in places not meant for sleeping (streets, vehicles, parks).</li>
+    <li>It does <b>not</b> count people staying with friends or family (&ldquo;doubled-up&rdquo;).</li>
+    <li>Each local area chooses its method, so methods differ from place to place.</li>
+  </ul>
+  <p class="src">Sources: HUD, 2024 Annual Homelessness Assessment Report (AHAR) Part 1; KCRHA 2024 PIT Count FAQ.</p>
+  <div class="notes-src" hidden>Keep it short. A PIT count is a one-night snapshot, not everyone who experiences homelessness over a year. KCRHA's FAQ says the PIT count "is broadly understood to be an undercount." HUD's AHAR says there is no universal method: each local area chooses among approved methods. The definition leaves out doubled-up people. Ask: who might a one-night count miss? Park that question; students return to it in Step 4.</div>
+</section>
+
+<!-- SLIDE 3 -->
+<section class="slide" aria-label="Slide 3 of 6">
+  <h2>Today's steps (about 45 minutes)</h2>
+  <div class="row">
+    <ol>
+      <li><b>Meet the data</b> (5 min)</li>
+      <li><b>Verify</b> in the original report (7)</li>
+      <li><b>Organize</b>: build a table and two bar charts (15)</li>
+      <li><b>Analyze</b> (8)</li>
+      <li><b>Reflect</b> and hand in (7)</li>
+    </ol>
+    <div class="card targets">
+      <p class="big">I can&hellip;</p>
+      <ul>
+        <li>decide what makes a comparison between places fair</li>
+        <li>find a number in the original source</li>
+        <li>turn raw numbers into a comparison I can defend</li>
+        <li>choose a scale and build a bar chart</li>
+        <li>use data to support a claim</li>
+      </ul>
+    </div>
+  </div>
+  <!-- NOTES 3: Everyone works on their own laptop in the interactive. Step 2: students find King County's number and one other in the HUD report; there is a "Show me where" hint and an "I can't open this site" fallback. Step 3 is the math: they compute the rate for each place themselves, then choose each chart's scale. Reflection sharing is optional. -->
+  <div class="notes-src" hidden>Everyone works on their own laptop in the interactive. Step 2: students find King County's number and one other in the HUD report; there is a "Show me where" hint and an "I can't open this site" fallback. Step 3 is the math: they compute each rate themselves, then choose each chart's scale. Reflection sharing is optional. Do not mention rates yet: students commit to an answer from raw counts first. Tell students where the file is and start Step 1. STOP the slides here. Come back for slide 4 when most students reach Step 3.</div>
+</section>
+
+<!-- SLIDE 4 -->
+<section class="slide" aria-label="Slide 4 of 6">
+  <h2>The idea: a rate per 10,000 people</h2>
+  <div class="card">
+    <p class="big">Worked example: the United States, 2024</p>
+    <p><span class="hl">771,480</span> people experiencing homelessness &divide; <span class="hl">340,003,797</span> people living in the U.S.</p>
+    <p class="big">771,480 &divide; 340,003,797 &times; 10,000 &asymp; <span class="hl">22.7</span></p>
+    <p>About 23 people for every 10,000 people. HUD prints &ldquo;about 23 of every 10,000.&rdquo;</p>
+  </div>
+  <p><b>Your turn:</b> the same steps for six places. Do you expect the order to stay the same?</p>
+  <p class="src">Sources: HUD 2024 PIT report, all states, territories, Puerto Rico and DC (771,480); U.S. Census Bureau Vintage 2025, July 1, 2024 (340,003,797); HUD AHAR 2024 Part 1 (&ldquo;about 23 of every 10,000&rdquo;).</p>
+  <div class="notes-src" hidden>Show this slide when most students reach Step 3, not during the launch, so their first answer comes from raw counts. Walk through the division slowly: count divided by population gives a tiny decimal (about 0.00227); multiplying by 10,000 turns it into "people per 10,000," which is easier to read. Do not do the six places for them. Note for students who ask why 22.7 and HUD says about 23: the HUD count includes U.S. territories and Puerto Rico, while the Census population is the 50 states and DC only (sources.md, Data set 4), and 22.7 rounds to about 23. Do not predict the order for the class.</div>
+</section>
+
+<!-- SLIDE 5 -->
+<section class="slide" aria-label="Slide 5 of 6">
+  <h2>Closing discussion</h2>
+  <ul>
+    <li>Did the ranking change when you used rates instead of counts? What moved?</li>
+    <li>When is a count the better number? When is a rate?</li>
+    <li>Who might a one-night count miss?</li>
+    <li>What question would you want data to answer next?</li>
+  </ul>
+  <p class="sub">Turn to a neighbor for one minute, then we'll hear from a few volunteers. Passing is always fine.</p>
+  <!-- NOTES 5: Let students draw the conclusions. Reflect back what they say with the data ("so the rate for X was ..."). Do not tell them what the numbers mean. Caveats students may raise are all in sources.md: one night only; doubled-up people not counted; methods differ by place; count dates are January while Census population is July 1. If a student shares something personal, thank them, keep the discussion on the data, and follow your school's procedure afterward. -->
+  <div class="notes-src" hidden>Let students draw the conclusions. Reflect back what they say with the data ("so the rate for X was..."). Do not tell them what the numbers mean. Caveats students may raise are all in sources.md: one night only; doubled-up people not counted; methods differ by place; count dates are January while Census population is July 1. Sharing is optional. If a student shares something personal, thank them, keep the discussion on the data, and follow your school's procedure afterward.</div>
+</section>
+
+<!-- SLIDE 6 -->
+<section class="slide" aria-label="Slide 6 of 6">
+  <h2>Hand in, and where the data came from</h2>
+  <div class="row">
+    <div class="card">
+      <p class="big">To hand in</p>
+      <ol>
+        <li>Finish Reflect in the interactive.</li>
+        <li>Export your work as a PDF.</li>
+        <li>Submit the PDF where your teacher tells you.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <p class="big">Where the data came from</p>
+      <ul>
+        <li>Counts: HUD, 2024 Point-in-Time reports (January 2024)</li>
+        <li>Populations: U.S. Census Bureau, July 1, 2024 estimates</li>
+        <li>U.S. rate check: HUD 2024 AHAR, Part 1</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src">Search: &ldquo;HUD CoC Homeless Populations and Subpopulations Reports&rdquo; and &ldquo;huduser 2024 AHAR Part 1.&rdquo;</p>
+  <div class="notes-src" hidden>Say where to submit (your assignment). If time is short, tell students Reflect is homework and the PDF can be exported then. All figures and links are in sources.md, Data set 4. Thank students for their work.</div>
+</section>
+
+<div id="notes" role="region" aria-label="Speaker notes" aria-live="polite"></div>
+<div id="bar">
+  <span><button id="prev" aria-label="Previous slide">&larr; Back</button> <button id="next" aria-label="Next slide">Next &rarr;</button></span>
+  <span id="count" aria-live="polite">1 / 6</span>
+  <span><button id="tn" aria-label="Toggle speaker notes (N)">Notes (N)</button></span>
+</div>
+
+<script>
+(function(){
+  var s=[].slice.call(document.querySelectorAll('.slide')),i=0,n=document.getElementById('notes');
+  function show(k){
+    i=Math.max(0,Math.min(s.length-1,k));
+    s.forEach(function(e,j){e.classList.toggle('active',j===i)});
+    document.getElementById('count').textContent=(i+1)+' / '+s.length;
+    n.textContent=s[i].querySelector('.notes-src').textContent;
+  }
+  document.getElementById('prev').onclick=function(){show(i-1)};
+  document.getElementById('next').onclick=function(){show(i+1)};
+  document.getElementById('tn').onclick=function(){n.classList.toggle('on')};
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(i+1)}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(i-1)}
+    else if(e.key==='Home')show(0);
+    else if(e.key==='End')show(s.length-1);
+    else if(e.key==='n'||e.key==='N')n.classList.toggle('on');
+  });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#bar')||e.target.closest('#notes'))return;
+    show(e.clientX<window.innerWidth*0.2?i-1:i+1);
+  });
+  show(0);
+})();
+</script>
+</body>
+</html>

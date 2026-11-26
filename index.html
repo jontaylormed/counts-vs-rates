@@ -1,0 +1,1377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counts vs. Rates: Homelessness in Six Places</title>
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#1b2430; --muted:#4a5565; --line:#cfd5dd; --soft:#eef1f5;
+  --accent:#1d5689; --accent-dark:#143f66; --accent-ink:#ffffff; --focus:#0b57d0;
+  --ok:#1b6436; --okbg:#e8f4ec; --no:#8a3110; --nobg:#fbeee7; --info:#284d73; --infobg:#e9f0f8;
+  --pick:#fff4c9; --pickline:#7a6000;
+  --bar1:#2e6690; --bar2:#6a4a98; --grid:#d9dee5; --axis:#3b4654;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+a{color:var(--accent)}
+a:hover{color:var(--accent-dark)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-9999px;top:0;background:#fff;padding:8px 12px;z-index:10}
+.skip:focus{left:8px;top:8px}
+h1,h2,h3{line-height:1.25;margin:0 0 .5rem}
+h2{font-size:1.5rem} h3{font-size:1.15rem}
+p{margin:.5rem 0}
+code{background:var(--soft);padding:.05rem .35rem;border-radius:4px;font-size:.95em}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);padding:.45rem .9rem;min-height:40px}
+button:hover{background:var(--infobg)}
+button.primary{background:var(--accent);color:var(--accent-ink)}
+button.primary:hover{background:var(--accent-dark)}
+button:disabled{opacity:.55;cursor:not-allowed}
+button.linkbtn{border:0;background:none;padding:0;min-height:0;color:var(--accent);text-decoration:underline}
+input[type=text],textarea{font:inherit;color:var(--ink);background:#fff;border:1px solid #8b95a3;border-radius:6px;padding:.4rem .55rem}
+input[type=text]:disabled,textarea:disabled{background:var(--soft)}
+textarea{width:100%;min-height:5.2rem;resize:vertical}
+label{font-weight:600}
+fieldset{border:1px solid var(--line);border-radius:10px;padding:.75rem 1rem;margin:1rem 0}
+legend{font-weight:700;padding:0 .3rem}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.topbar{background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap;padding-top:.7rem;padding-bottom:.7rem}
+.kicker{font-size:.85rem;color:var(--muted);margin:0;font-weight:600;letter-spacing:.02em}
+.topbar h1{font-size:1.3rem;margin:0}
+.tools{display:flex;gap:.5rem;flex-wrap:wrap}
+#progress{background:var(--surface);border-bottom:1px solid var(--line)}
+#progress ol{list-style:none;margin:0;padding:.6rem 0 .4rem;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem}
+#progress button{width:100%;text-align:left;border:1px solid var(--line);color:var(--ink);background:var(--surface);display:flex;gap:.5rem;align-items:center;padding:.35rem .55rem;min-height:48px}
+#progress button[aria-current="step"]{border:2px solid var(--accent);background:var(--infobg)}
+#progress button:disabled{opacity:.6}
+#progress .n{flex:none;width:1.7rem;height:1.7rem;border-radius:50%;border:2px solid var(--accent);display:grid;place-items:center;font-weight:700;color:var(--accent);font-size:.9rem}
+#progress .done .n{background:var(--accent);color:#fff}
+#progress .lbl{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+#progress .lbl b{font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#progress .lbl small{color:var(--muted);font-size:.78rem}
+.pbar{height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin:0 0 .55rem}
+.pbar>div{height:100%;background:var(--accent);transition:width .3s}
+.savestatus{font-size:.82rem;color:var(--muted);margin:.4rem 0 0}
+main{padding:1rem 0 3rem}
+main:focus{outline:none}
+.stephead{margin:.5rem 0 1rem}
+.stepnum{color:var(--muted);font-weight:600;margin:0;font-size:.9rem}
+.stephead h2:focus{outline:none}
+.lead{font-size:1.06rem;max-width:62rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem 1.15rem;margin:1rem 0}
+.tablewrap{overflow-x:auto;max-width:100%}
+table.data{border-collapse:collapse;background:var(--surface);min-width:100%}
+table.data caption{text-align:left;font-weight:700;padding:.4rem 0}
+table.data th,table.data td{border-bottom:1px solid var(--line);padding:.45rem .7rem;text-align:left;vertical-align:middle}
+table.data thead th{background:var(--soft);font-size:.92rem}
+table.data .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.data tr.example th,table.data tr.example td{background:#f8f9fb;color:var(--muted)}
+table.data tr.fbrow td{border-bottom:1px solid var(--line);padding-top:0}
+.blank{display:inline-block;min-width:5.5rem;border:2px dashed #7d8796;border-radius:6px;text-align:center;color:var(--muted);padding:0 .4rem}
+.srcnote{font-size:.88rem;color:var(--muted)}
+.choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.4rem}
+.choices label{font-weight:500;display:flex;gap:.5rem;align-items:center;border:1px solid var(--line);border-radius:8px;padding:.45rem .6rem;background:#fff;cursor:pointer}
+.choices input{width:1.1rem;height:1.1rem;flex:none}
+.choices input:disabled+span{color:var(--muted)}
+.fb{margin:.5rem 0;padding:.5rem .7rem;border-radius:8px;border-left:5px solid transparent}
+.fb:empty{display:none}
+.fb-ok{background:var(--okbg);border-color:var(--ok);color:#123f22}
+.fb-no{background:var(--nobg);border-color:var(--no);color:#5c1f08}
+.fb-info{background:var(--infobg);border-color:var(--info);color:#1b3550}
+.fbrow .fb{margin:.15rem 0 .4rem}
+.ok-mark{color:var(--ok);font-weight:700}
+.nav{display:flex;justify-content:space-between;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap}
+.warn{background:var(--nobg);border:1px solid #d9a98f;border-radius:10px;padding:.75rem 1rem;margin-top:1rem}
+.warn:focus{outline:3px solid var(--focus)}
+.warn ul{margin:.3rem 0 .5rem}
+.row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.field{margin:.75rem 0}
+.field label{display:block;margin-bottom:.25rem}
+.hintbox{background:var(--infobg);border:1px solid #b9cde3;border-radius:10px;padding:.6rem 1rem;margin:.6rem 0}
+.hintbox ol{margin:.3rem 0;padding-left:1.3rem}
+.offer{font-weight:600;color:var(--info)}
+dl.find{display:grid;grid-template-columns:max-content 1fr;gap:.25rem .9rem;margin:.5rem 0}
+dl.find dt{font-weight:700;color:var(--muted)}
+dl.find dd{margin:0}
+.verify-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:1rem}
+.verify-grid .card{margin:0}
+.lockcard{background:var(--pick);border:1px solid var(--pickline);border-radius:12px;padding:.8rem 1rem;margin:1rem 0}
+.s3grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:1.25rem;align-items:start}
+.calc{position:sticky;top:.75rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem}
+.calc input{width:100%;font-family:ui-monospace,Consolas,monospace}
+.calcout{font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;margin:.4rem 0;word-break:break-all}
+.calc ul{list-style:none;padding:0;margin:.3rem 0 0;font-size:.85rem;color:var(--muted)}
+.calc li{font-family:ui-monospace,Consolas,monospace;word-break:break-all}
+.small{font-size:.88rem;color:var(--muted)}
+.example .steps{margin:.4rem 0 .6rem;padding-left:1.2rem}
+.example .steps li{margin:.25rem 0}
+.formula{font-size:1.05rem;background:var(--soft);border-radius:8px;padding:.45rem .7rem;display:inline-block}
+.rate-in{width:7rem;text-align:right}
+.parthead{margin-top:2rem;padding-top:1rem;border-top:2px solid var(--line)}
+.chartcard .setup{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:0 1rem}
+.chartcard fieldset{min-width:0}
+.chartcard fieldset{margin:.5rem 0}
+.chartcard .field input{width:100%}
+.scaleins{display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end}
+.scaleins .field{margin:.25rem 0}
+.scaleins input{width:8.5rem}
+.svgwrap{max-width:760px}
+svg.chart{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--line);border-radius:8px}
+svg.chart.interactive{touch-action:none}
+svg .c-title{font-size:17px;font-weight:700;fill:var(--ink)}
+svg .c-axis{font-size:14px;font-weight:600;fill:var(--ink)}
+svg .c-tick{font-size:12.5px;fill:var(--muted)}
+svg .c-name{font-size:13px;fill:var(--ink)}
+svg .c-val{font-size:12.5px;font-weight:700;fill:var(--ink)}
+svg .c-mark{font-size:12px;font-weight:700;fill:var(--no)}
+svg .c-placeholder{font-size:15px;fill:var(--muted)}
+svg .grid{stroke:var(--grid);stroke-width:1}
+svg .axisline{stroke:var(--axis);stroke-width:1.5}
+svg .hit{cursor:ns-resize;outline:none}
+svg .hit:hover{fill-opacity:.04}
+svg .hit:focus{stroke:var(--focus);stroke-width:3;stroke-dasharray:7 4;fill-opacity:.06}
+.barins{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem;margin:.6rem 0}
+.barins label{display:block;font-size:.9rem}
+.barins input{width:100%;text-align:right}
+.donecharts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.rankings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.rankings ol{padding-left:0;list-style:none;counter-reset:r;margin:.3rem 0}
+.rankings li{counter-increment:r;display:grid;grid-template-columns:2rem 1fr auto;gap:.5rem;align-items:center;padding:.45rem .6rem;border:1px solid var(--line);border-radius:8px;margin:.3rem 0;background:#fff}
+.rankings li::before{content:counter(r) ".";font-weight:700;color:var(--muted)}
+.rankings li.pick{background:var(--pick);border:2px solid var(--pickline);font-weight:700}
+.rankings .val{font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;border:1px solid var(--pickline);border-radius:999px;padding:0 .45rem;margin-left:.35rem;background:#fff;color:#4d3d00}
+.reading{background:#fbfaf6;border:1px solid #ded8c4;border-radius:12px;padding:.8rem 1.1rem}
+.reading ul{padding-left:1.2rem}
+.reading li{margin:.4rem 0}
+.care{background:var(--infobg);border-radius:8px;padding:.5rem .75rem}
+.check{display:flex;gap:.5rem;align-items:center;font-weight:500;margin:.4rem 0}
+.check input{width:1.1rem;height:1.1rem}
+.savebox{border:2px solid var(--accent)}
+.foot{font-size:.85rem;color:var(--muted);padding:1rem 0 2rem;border-top:1px solid var(--line)}
+dialog{border:1px solid var(--line);border-radius:12px;padding:0;max-width:min(980px,calc(100vw - 32px));width:100%;max-height:calc(100vh - 32px);color:var(--ink)}
+dialog::backdrop{background:rgba(20,28,38,.55)}
+dialog.small{max-width:min(520px,calc(100vw - 32px))}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.75rem 1.1rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}
+.dlg-head h2{margin:0;font-size:1.25rem}
+.dlg-body{padding:.75rem 1.1rem 1.1rem}
+.dlg-body table.data{font-size:.88rem}
+.dlg-body td{word-break:break-word}
+.dlg-body h3{margin-top:1.1rem}
+#report{display:none}
+@media (max-width:980px){
+  .s3grid{grid-template-columns:minmax(0,1fr)}
+  .calc{position:static}
+}
+@media (max-width:760px){
+  #progress ol{grid-template-columns:repeat(5,minmax(0,1fr))}
+  #progress .lbl{display:none}
+  #progress button{justify-content:center}
+  .donecharts,.rankings{grid-template-columns:1fr}
+  dl.find{grid-template-columns:1fr}
+  .verify-grid{grid-template-columns:1fr}
+  h2{font-size:1.3rem}
+}
+@media print{
+  @page{margin:14mm}
+  body{background:#fff;font-size:11pt}
+  .skip,.topbar,#progress,main,.foot,dialog,#live{display:none!important}
+  #report{display:block!important;color:#000}
+  #report h1{font-size:17pt;margin-bottom:4pt}
+  #report h2{font-size:13pt;margin:12pt 0 4pt;border-bottom:1px solid #999;padding-bottom:2pt;break-after:avoid}
+  #report table{border-collapse:collapse;width:100%;font-size:9.5pt}
+  #report th,#report td{border:1px solid #999;padding:3pt 5pt;text-align:left}
+  #report .num{text-align:right}
+  #report .rp-charts{display:grid;grid-template-columns:1fr 1fr;gap:8pt}
+  #report .rp-charts>div,#report .rp-block{break-inside:avoid}
+  #report svg{width:100%;height:auto;border:1px solid #999}
+  #report .rp-ans{white-space:pre-wrap;border:1px solid #bbb;padding:4pt 6pt;margin:2pt 0 8pt}
+  #report .rp-rank{display:grid;grid-template-columns:1fr 1fr;gap:10pt}
+  #report .rp-rank ol{margin:2pt 0;padding-left:16pt}
+  #report .rp-meta{font-size:11.5pt}
+  #report .small{font-size:9pt;color:#333}
+}
+</style>
+</head>
+<body>
+<div id="loadNotice"><p><strong>This lesson did not load.</strong> It has to be opened as a file, not pasted into a page. Ask your teacher for the link to the lesson file.</p></div>
+<script>(function(){var n=document.getElementById('loadNotice');if(n)n.parentNode.removeChild(n);})();</script>
+<a class="skip" href="#main">Skip to the lesson</a>
+<header class="topbar">
+  <div class="wrap">
+    <div>
+      <p class="kicker">Lesson 1 · Rates per 10,000 people</p>
+      <h1>Which place has the most homelessness?</h1>
+    </div>
+    <div class="tools">
+      <button type="button" id="btnSources" aria-haspopup="dialog">Sources</button>
+      <button type="button" id="btnStartOver" aria-haspopup="dialog">Start over</button>
+    </div>
+  </div>
+</header>
+<nav id="progress" aria-label="Lesson steps">
+  <div class="wrap">
+    <ol id="stepsList"></ol>
+    <div class="pbar" id="pbar" role="progressbar" aria-label="Lesson progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><div style="width:0%"></div></div>
+  </div>
+</nav>
+<div class="wrap">
+  <p class="savestatus" id="saveStatus"></p>
+  <main id="main" tabindex="-1">
+    <noscript><p class="card">This activity needs JavaScript turned on. Ask your teacher for help.</p></noscript>
+  </main>
+  <footer class="foot">
+    <p>No login. Nothing you type is sent anywhere. Your work is kept only in this tab, and it is erased when you close the tab, so save it as a PDF first.</p>
+  </footer>
+</div>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<dialog id="dlgSources" aria-labelledby="src-h">
+  <div class="dlg-head"><h2 id="src-h">Sources for every number</h2><button type="button" data-close>Close</button></div>
+  <div class="dlg-body" id="srcBody"></div>
+</dialog>
+
+<dialog id="dlgStartOver" class="small" aria-labelledby="so-h" aria-describedby="so-d">
+  <div class="dlg-head"><h2 id="so-h">Start over?</h2></div>
+  <div class="dlg-body">
+    <p id="so-d">This erases all of your answers in this tab and takes you back to Step 1. It cannot be undone. If you want to keep your work, save it as a PDF first (Step 5).</p>
+    <div class="row">
+      <button type="button" class="primary" id="soYes">Yes, erase my work and start over</button>
+      <button type="button" id="soNo" data-close>Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<section id="report" aria-hidden="true"></section>
+
+<script>
+/*CORE-START*/
+(function (root) {
+  'use strict';
+  const HUD_BASE = 'https://files.hudexchange.info/reports/published/';
+  const HUD_PAGE = 'https://www.hudexchange.info/programs/coc/coc-homeless-populations-and-subpopulations-reports/';
+  const HUD_PHRASE = 'HUD CoC Homeless Populations and Subpopulations Reports';
+
+  // Raw numbers copied from sources.md, Data set 4, table 4a (HUD 2024 PopSub reports; Census Vintage 2025, July 1, 2024).
+  // Listed in alphabetical order of place name.
+  const PLACES = [
+    { id: 'king', name: 'King County, WA', short: 'King', coc: 'WA-500', st: 'WA', cocName: 'WA-500 Seattle/King County CoC', pitDate: '1/25/2024', es: 5601, th: 1457, un: 9810, count: 16868, pop: 2317959 },
+    { id: 'maricopa', name: 'Maricopa County, AZ (Phoenix)', short: 'Maricopa', coc: 'AZ-502', st: 'AZ', cocName: 'AZ-502 Phoenix, Mesa/Maricopa County CoC', pitDate: '1/22/2024', es: 4174, th: 1185, un: 4076, count: 9435, pop: 4654147 },
+    { id: 'multnomah', name: 'Multnomah County, OR (Portland)', short: 'Multnomah', coc: 'OR-501', st: 'OR', cocName: 'OR-501 Portland, Gresham/Multnomah County CoC', pitDate: '1/30/2024', es: 2745, th: 695, un: 3944, count: 7384, pop: 794472 },
+    { id: 'pierce', name: 'Pierce County, WA (Tacoma)', short: 'Pierce', coc: 'WA-503', st: 'WA', cocName: 'WA-503 Tacoma, Lakewood/Pierce County CoC', pitDate: '1/25/2024', es: 1311, th: 134, un: 1216, count: 2661, pop: 939786 },
+    { id: 'sandiego', name: 'San Diego County, CA', short: 'San Diego', coc: 'CA-601', st: 'CA', cocName: 'CA-601 San Diego City and County CoC', pitDate: '1/24/2024', es: 3177, th: 1318, un: 6110, count: 10605, pop: 3287542 },
+    { id: 'sf', name: 'San Francisco, CA', short: 'San Francisco', coc: 'CA-501', st: 'CA', cocName: 'CA-501 San Francisco CoC', pitDate: '1/30/2024', es: 3644, th: 325, un: 4354, count: 8323, pop: 820945 }
+  ];
+  PLACES.forEach(function (p) { p.pdf = HUD_BASE + 'CoC_PopSub_CoC_' + p.coc + '-2024_' + p.st + '_2024.pdf'; });
+  const US = { id: 'us', name: 'United States', es: 431478, th: 65778, un: 274224, count: 771480, pop: 340003797, pdf: HUD_BASE + 'CoC_PopSub_NatlTerrDC_2024.pdf' };
+
+  function byId(id) { return PLACES.find(function (p) { return p.id === id; }) || null; }
+  function rate(p) { return p.count / p.pop * 10000; }
+
+  function fmt(n, maxDec) {
+    if (n === null || n === undefined || isNaN(n)) return '';
+    return Number(n).toLocaleString('en-US', { maximumFractionDigits: maxDec === undefined ? 2 : maxDec });
+  }
+
+  function parseNum(str) {
+    if (str === null || str === undefined) return NaN;
+    const s = String(str).trim().replace(/[,\s]/g, '');
+    if (!/^[-+]?(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+    return parseFloat(s);
+  }
+
+  // ---------- Safe calculator (recursive-descent parser; no eval / Function) ----------
+  function calcEval(src) {
+    let s = String(src === undefined || src === null ? '' : src);
+    if (!s.trim()) throw new Error('Type a calculation first.');
+    if (s.length > 200) throw new Error('That is too long. Try a shorter calculation.');
+    s = s.replace(/[×xX]/g, '*').replace(/÷/g, '/').replace(/[−–—]/g, '-');
+    let prev;
+    do { prev = s; s = s.replace(/(\d),(\d{3})(?!\d)/g, '$1$2'); } while (s !== prev);
+    const toks = [];
+    let i = 0;
+    while (i < s.length) {
+      const c = s[i];
+      if (c === ' ' || c === '\t') { i++; continue; }
+      if (/[0-9.]/.test(c)) {
+        const m = /^(\d+\.?\d*|\.\d+)/.exec(s.slice(i));
+        if (!m) throw new Error('I can’t read the number near “' + s.slice(i, i + 6) + '”.');
+        i += m[0].length;
+        if (s[i] === '.') throw new Error('A number has two decimal points.');
+        toks.push({ t: 'n', v: parseFloat(m[0]) });
+        continue;
+      }
+      if ('+-*/()'.indexOf(c) >= 0) { toks.push({ t: c }); i++; continue; }
+      if (c === ',') throw new Error('Commas can only go inside big numbers, like 2,317,959.');
+      throw new Error('The calculator only understands numbers, + − × ÷ and parentheses. It found “' + c + '”.');
+    }
+    let p = 0;
+    function peek() { return toks[p]; }
+    function expr() {
+      let v = term();
+      while (peek() && (peek().t === '+' || peek().t === '-')) {
+        const op = toks[p++].t; const r = term();
+        v = op === '+' ? v + r : v - r;
+      }
+      return v;
+    }
+    function term() {
+      let v = factor();
+      while (peek() && (peek().t === '*' || peek().t === '/')) {
+        const op = toks[p++].t; const r = factor();
+        if (op === '/') { if (r === 0) throw new Error('You can’t divide by zero.'); v = v / r; } else v = v * r;
+      }
+      return v;
+    }
+    function factor() {
+      const tk = peek();
+      if (!tk) throw new Error('The calculation ends too soon. Is a number missing at the end?');
+      if (tk.t === '+' || tk.t === '-') { p++; const v = factor(); return tk.t === '-' ? -v : v; }
+      return primary();
+    }
+    function primary() {
+      const tk = toks[p++];
+      if (!tk) throw new Error('The calculation ends too soon. Is a number missing at the end?');
+      if (tk.t === 'n') return tk.v;
+      if (tk.t === '(') {
+        const v = expr();
+        if (!peek() || peek().t !== ')') throw new Error('A “(” is missing its “)”.');
+        p++;
+        return v;
+      }
+      if (tk.t === ')') throw new Error('There is a “)” without a matching “(”, or a number is missing.');
+      throw new Error('Two signs are next to each other near “' + tk.t + '”. Is a number missing?');
+    }
+    const v = expr();
+    if (p < toks.length) {
+      if (toks[p].t === ')') throw new Error('There is an extra “)”.');
+      throw new Error('Two numbers are next to each other with no sign between them.');
+    }
+    if (!isFinite(v)) throw new Error('That result is too big to show.');
+    return v;
+  }
+
+  function formatCalc(v) {
+    const a = Math.abs(v);
+    let d = 4;
+    if (a !== 0 && a < 1) d = Math.min(12, 3 - Math.floor(Math.log10(a)) + 1);
+    return v.toLocaleString('en-US', { maximumFractionDigits: d });
+  }
+
+  // ---------- Rate checking ----------
+  const RATE_TOL = 0.5;
+  function checkRate(v, p) { return Math.abs(v - rate(p)) <= RATE_TOL; }
+
+  function diagnoseRate(v, count, pop) {
+    const r = count / pop * 10000;
+    function near(a, b) { return b !== 0 && Math.abs(a - b) / Math.abs(b) < 0.03; }
+    if (Math.abs(v - r) <= RATE_TOL) return null;
+    if (Math.abs(v - r) <= 2) return 'close';
+    if (near(v, count / pop)) return 'noScale';
+    if (near(v, r / 100)) return 'percent';
+    if (near(v, r / 10)) return 'per1000';
+    if (near(v, r * 10)) return 'per100k';
+    if (near(v, pop / count * 10000) || near(v, pop / count)) return 'flipped';
+    return null;
+  }
+
+  const DIAG = {
+    close: 'Close! Check your rounding. Round to the nearest whole number or to one decimal place. Don’t just drop the decimals.',
+    noScale: 'It looks like you divided but did not multiply by 10,000. Dividing gives people counted per 1 person. Multiply by 10,000 to get the rate per 10,000 people.',
+    percent: 'That looks like a percent (per 100 people). We want per 10,000 people, so multiply by 10,000 instead of 100.',
+    per1000: 'That looks like a rate per 1,000 people. Count the zeros: 10,000 has four zeros.',
+    per100k: 'That looks like a rate per 100,000 people. Count the zeros: 10,000 has four zeros.',
+    flipped: 'It looks like the division is upside down. Put the people counted on top: people counted ÷ population.'
+  };
+  const SETUP = 'Set-up hint: rate per 10,000 = (people counted ÷ population) × 10,000. Divide the smaller number (people counted) by the bigger number (population). Then multiply by 10,000.';
+
+  function rateAttempt(valueStr, p, priorTries) {
+    const v = parseNum(valueStr);
+    if (isNaN(v)) return { counted: false, ok: false, tries: priorTries, kind: 'no', msg: 'Type a number, like 12.5. Leave out words and units.' };
+    const tries = priorTries + 1;
+    if (checkRate(v, p)) return { counted: true, ok: true, tries: tries, kind: 'ok', msg: 'That matches. ' + fmt(v, 2) + ' people counted for every 10,000 people living in ' + p.name + '.' };
+    const d = diagnoseRate(v, p.count, p.pop);
+    let msg;
+    if (tries === 1) {
+      msg = d === 'close' ? DIAG.close : 'Not quite. Look again at what you typed into the calculator, and check that you used this row’s numbers.';
+    } else if (tries === 2) {
+      msg = d ? DIAG[d] : SETUP;
+    } else {
+      msg = (d ? DIAG[d] + ' ' : '') + 'Here is the set-up for this row: ' + fmt(p.count) + ' ÷ ' + fmt(p.pop) + ' × 10,000. Type that into the calculator, then round.';
+    }
+    return { counted: true, ok: false, tries: tries, kind: 'no', diag: d, msg: msg, canReveal: tries >= 4 };
+  }
+
+  // ---------- Verification checking ----------
+  function checkVerify(valueStr, p) {
+    const v = parseNum(valueStr);
+    if (isNaN(v)) return { counted: false, ok: false, msg: 'Type the number you found, like 12,345.' };
+    if (v === p.count) return { counted: true, ok: true, msg: 'Match! ' + fmt(p.count) + ' is the total HUD reports for ' + p.name + '.' };
+    let msg;
+    if (v === p.es) msg = 'That number is in the report, but it is only the Emergency Shelter column. Keep reading across the “Total Homeless Persons” row to the Total column.';
+    else if (v === p.th) msg = 'That number is in the report, but it is only the Transitional Housing column. Keep reading across to the Total column.';
+    else if (v === p.un) msg = 'That number is in the report, but it is only the Unsheltered column. We want everyone counted, which is the Total column.';
+    else if (v === p.es + p.th) msg = 'That is the number of people in shelters and transitional housing. We want everyone counted, which is the Total column.';
+    else {
+      const other = PLACES.find(function (q) { return q.id !== p.id && q.count === v; });
+      if (other) msg = 'That is the total for ' + other.name + '. Make sure you opened the report for ' + p.cocName + '.';
+      else msg = 'That doesn’t match. Check that you opened the 2024 report for ' + p.cocName + ', and that you are reading the “Total Homeless Persons” row in the Total column.';
+    }
+    return { counted: true, ok: false, msg: msg };
+  }
+
+  // ---------- Chart scale and bars ----------
+  function validateScale(maxStr, stepStr, dataMax) {
+    const max = parseNum(maxStr), st = parseNum(stepStr);
+    if (isNaN(max)) return { ok: false, msg: 'Type a number for the axis maximum.' };
+    if (isNaN(st)) return { ok: false, msg: 'Type a number for the tick step.' };
+    if (max <= 0) return { ok: false, msg: 'The axis maximum has to be more than 0.' };
+    if (st <= 0) return { ok: false, msg: 'The tick step has to be more than 0.' };
+    if (max < dataMax) return { ok: false, msg: 'This scale can’t fit your data. Your biggest value is ' + fmt(dataMax) + ', but your axis stops at ' + fmt(max) + '. That bar would go off the top of the chart.' };
+    if (st > max) return { ok: false, msg: 'The tick step (' + fmt(st) + ') is bigger than the axis maximum (' + fmt(max) + '), so there would be no labels between 0 and the top.' };
+    const nRaw = max / st;
+    const n = Math.round(nRaw);
+    if (Math.abs(nRaw - n) > 1e-6) return { ok: false, msg: 'The tick step should divide evenly into the maximum so the top of the axis gets a label. ' + fmt(max) + ' ÷ ' + fmt(st) + ' = ' + fmt(nRaw, 3) + ', which is not a whole number.' };
+    if (n < 2) return { ok: false, msg: 'That gives only ' + n + ' step from 0 to the top, which makes bar heights hard to read. Use a smaller tick step.' };
+    if (n > 20) return { ok: false, msg: 'That makes ' + n + ' tick labels, which is too crowded to read. Use a bigger tick step (about 4 to 12 ticks works well).' };
+    let note = '';
+    if (max > dataMax * 3) note = 'This scale works, but your tallest bar will fill less than a third of the chart. A smaller maximum would make the bars easier to compare.';
+    return { ok: true, max: max, st: st, n: n, note: note };
+  }
+
+  function niceScale(m) {
+    const k = Math.pow(10, Math.floor(Math.log10(m / 5)));
+    const cands = [1, 2, 2.5, 5, 10, 20].map(function (c) { return c * k; });
+    for (let i = 0; i < cands.length; i++) {
+      const st = cands[i];
+      const max = Math.round(Math.ceil(m / st - 1e-9) * st * 1e6) / 1e6;
+      const n = Math.round(max / st);
+      if (n >= 4 && n <= 10) return { max: max, st: st };
+    }
+    return { max: Math.ceil(m / k) * k, st: k * 10 };
+  }
+
+  function barInc(max) { return Math.pow(10, Math.floor(Math.log10(max / 100))); }
+  function barTol(max) { return Math.max(max * 0.02, barInc(max) * 0.5); }
+
+  function checkBars(bars, targets, max) {
+    const tol = barTol(max);
+    const results = PLACES.map(function (p) {
+      const v = bars[p.id], t = targets[p.id];
+      if (v === undefined || v === null || !(v > 0)) return { id: p.id, state: 'unset', t: t };
+      if (Math.abs(v - t) <= tol) return { id: p.id, state: 'ok', v: v, t: t };
+      return { id: p.id, state: v > t ? 'high' : 'low', v: v, t: t };
+    });
+    return { tol: tol, results: results, allOk: results.every(function (r) { return r.state === 'ok'; }) };
+  }
+
+  root.L01 = {
+    PLACES: PLACES, US: US, HUD_PAGE: HUD_PAGE, HUD_PHRASE: HUD_PHRASE, byId: byId, rate: rate, fmt: fmt, parseNum: parseNum,
+    calcEval: calcEval, formatCalc: formatCalc, checkRate: checkRate, diagnoseRate: diagnoseRate, rateAttempt: rateAttempt,
+    checkVerify: checkVerify, validateScale: validateScale, niceScale: niceScale, barInc: barInc, barTol: barTol, checkBars: checkBars, RATE_TOL: RATE_TOL
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+/*CORE-END*/
+</script>
+
+<script>
+(function () {
+  'use strict';
+  const L = window.L01;
+  const PLACES = L.PLACES, US = L.US, fmt = L.fmt;
+  const DATE_CHECKED = 'November 16, 2026';
+  const CENSUS_COUNTY_PAGE = 'https://www.census.gov/data/tables/time-series/demo/popest/2020s-counties-total.html';
+  const CENSUS_COUNTY_CSV = 'https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/counties/totals/co-est2025-alldata.csv';
+  const CENSUS_STATE_CSV = 'https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv';
+  const AHAR_URL = 'https://www.huduser.gov/portal/sites/default/files/pdf/2024-AHAR-Part-1.pdf';
+  const KCRHA_FAQ_URL = 'https://kcrha.org/wp-content/uploads/2025/04/KCRHA-2024-PIT-Count-FAQ-v2.pdf';
+  const STEPS = [null,
+    { name: 'Meet the data', min: 5 }, { name: 'Verify', min: 7 }, { name: 'Organize', min: 15 },
+    { name: 'Analyze', min: 8 }, { name: 'Reflect', min: 7 }];
+
+  // Self-check of the raw data (each HUD row: ES + TH + unsheltered = total).
+  PLACES.concat([US]).forEach(function (p) {
+    if (p.es + p.th + p.un !== p.count) console.warn('Data check failed for ' + p.name);
+  });
+
+  // ---------- State and storage ----------
+  const KEY = 'lesson01-counts-vs-rates-v1';
+  let storageOK = false;
+
+  function freshChart() { return { maxIn: '', stepIn: '', scale: null, scaleTries: 0, title: '', ylabel: '', xlabel: '', bars: {}, checks: 0, status: 'open', filled: false, lastCheck: null }; }
+  function freshState() {
+    return {
+      v: 1, step: 1, maxStep: 1,
+      pick: null, pickWhy: '', pickLocked: false,
+      second: null, verify: {}, rates: {}, usShown: 0,
+      charts: { count: freshChart(), rate: freshChart() },
+      readCaveats: false,
+      ans: { q1: '', q2: '', q3: '', r1: '', r2: '', r2skip: false, r3: '' }
+    };
+  }
+  function merge(base, o) {
+    Object.keys(o || {}).forEach(function (k) {
+      const bv = base[k], ov = o[k];
+      if (bv && typeof bv === 'object' && !Array.isArray(bv) && ov && typeof ov === 'object' && !Array.isArray(ov) && Object.keys(bv).length) merge(bv, ov);
+      else base[k] = ov;
+    });
+    return base;
+  }
+  function load() {
+    try {
+      const ls = window.sessionStorage;
+      const raw = ls.getItem(KEY);
+      storageOK = true;
+      if (raw) { const o = JSON.parse(raw); if (o && o.v === 1) return merge(freshState(), o); }
+    } catch (e) { storageOK = false; }
+    return freshState();
+  }
+  function save() {
+    if (!storageOK) return;
+    try { window.sessionStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { storageOK = false; updateSaveStatus(); }
+  }
+  function clearStorage() { try { window.sessionStorage.removeItem(KEY); } catch (e) { /* ignore */ } }
+
+  let S = load();
+  const UI = { fb: {}, navWarn: null, focus: null, calcIn: '', calcOut: '', calcHist: [], calcErr: false, cantOpen: {}, name: '' };
+
+  // ---------- Helpers ----------
+  function esc(s) { return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  const live = document.getElementById('live');
+  function announce(msg) { live.textContent = ''; setTimeout(function () { live.textContent = msg; }, 60); }
+  const FB_LABEL = { ok: '✓ Correct.', no: '✗ Not yet.', info: 'ℹ Note:', done: '✓ Done.' };
+  function setFb(key, kind, msg, label) {
+    UI.fb[key] = { kind: kind, msg: msg, label: label || FB_LABEL[kind] };
+    announce(UI.fb[key].label + ' ' + msg);
+  }
+  function fbHTML(key) {
+    const f = UI.fb[key];
+    if (!f) return '<p class="fb" id="fb-' + key + '"></p>';
+    const cls = f.kind === 'done' ? 'ok' : f.kind;
+    return '<p class="fb fb-' + cls + '" id="fb-' + key + '"><strong>' + esc(f.label) + '</strong> ' + esc(f.msg) + '</p>';
+  }
+  function ext(url, text) { return '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(text) + '<span class="sr-only"> (opens in a new tab)</span></a>'; }
+  function setPath(obj, path, val) { const parts = path.split('.'); let o = obj; for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]]; o[parts[parts.length - 1]] = val; }
+  function vItem(id) { if (!S.verify[id]) S.verify[id] = { value: '', tries: 0, status: 'open', started: null, offered: false, hintOpen: false }; return S.verify[id]; }
+  function rItem(id) { if (!S.rates[id]) S.rates[id] = { value: '', tries: 0, status: 'open' }; return S.rates[id]; }
+  function verifyTargets() { return S.second ? ['king', S.second] : ['king']; }
+  function studentRate(id) {
+    const r = S.rates[id];
+    if (!r) return null;
+    if (r.status === 'correct') return L.parseNum(r.value);
+    if (r.status === 'revealed') return Math.round(L.rate(L.byId(id)) * 10) / 10;
+    return null;
+  }
+  function allRatesResolved() { return PLACES.every(function (p) { return studentRate(p.id) !== null; }); }
+  function tableValue(kind, id) { return kind === 'count' ? L.byId(id).count : studentRate(id); }
+  function dataMax(kind) { return Math.max.apply(null, PLACES.map(function (p) { return tableValue(kind, p.id) || 0; })); }
+  function placeName(id) { const p = L.byId(id); return p ? p.name : ''; }
+
+  // ---------- Step completion ----------
+  function stepDone(n) {
+    if (n === 1) return S.pickLocked;
+    if (n === 2) return !!S.second && verifyTargets().every(function (id) { return vItem(id).status !== 'open'; });
+    if (n === 3) return allRatesResolved() && S.charts.count.status === 'done' && S.charts.rate.status === 'done';
+    if (n === 4) return ['q1', 'q2', 'q3'].every(function (k) { return S.ans[k].trim(); });
+    if (n === 5) return S.ans.r1.trim() && S.ans.r3.trim() && (S.ans.r2skip || S.ans.r2.trim());
+    return false;
+  }
+  function missing(n) {
+    const block = [], soft = [];
+    if (n === 1) {
+      if (!S.pickLocked) block.push('Choose a place, write one sentence about why, and press “Lock in my answer.”');
+    } else if (n === 2) {
+      if (!S.second) block.push('Choose a second place to check.');
+      verifyTargets().forEach(function (id) {
+        if (vItem(id).status === 'open') block.push('Find the number for ' + placeName(id) + '. If the site won’t open, use “I can’t open this site.”');
+      });
+    } else if (n === 3) {
+      PLACES.forEach(function (p) {
+        if (studentRate(p.id) === null) block.push('Rate per 10,000 for ' + p.name + '. (After 4 tries, a “Show me the answer” button appears.)');
+      });
+      if (!block.length) {
+        if (S.charts.count.status !== 'done') soft.push('Chart 1 (people counted) is not finished.');
+        if (S.charts.rate.status !== 'done') soft.push('Chart 2 (rate per 10,000) is not finished.');
+      }
+    } else if (n === 4) {
+      [['q1', 'Question 1'], ['q2', 'Question 2'], ['q3', 'Question 3']].forEach(function (q) { if (!S.ans[q[0]].trim()) soft.push(q[1] + ' has no answer yet.'); });
+    }
+    return { block: block, soft: soft };
+  }
+
+  // ---------- Navigation ----------
+  const main = document.getElementById('main');
+  function renderNav() {
+    const ol = document.getElementById('stepsList');
+    let h = '';
+    for (let n = 1; n <= 5; n++) {
+      const done = stepDone(n), cur = S.step === n, can = n <= S.maxStep;
+      h += '<li class="' + (done ? 'done' : '') + '"><button type="button" data-goto="' + n + '"' + (cur ? ' aria-current="step"' : '') + (can ? '' : ' disabled') + '>' +
+        '<span class="n" aria-hidden="true">' + (done ? '✓' : n) + '</span><span class="lbl"><b>' + STEPS[n].name + '</b><small>' + STEPS[n].min + ' min' + (done ? ' · done' : '') + '</small></span>' +
+        '<span class="sr-only">Step ' + n + ': ' + STEPS[n].name + ', about ' + STEPS[n].min + ' minutes' + (done ? ', completed' : '') + (can ? '' : ', not reached yet') + '</span></button></li>';
+    }
+    ol.innerHTML = h;
+    let count = 0; for (let n = 1; n <= 5; n++) if (stepDone(n)) count++;
+    const pb = document.getElementById('pbar');
+    pb.setAttribute('aria-valuenow', count);
+    pb.setAttribute('aria-valuetext', count + ' of 5 steps completed');
+    pb.firstElementChild.style.width = (count / 5 * 100) + '%';
+  }
+  document.getElementById('stepsList').addEventListener('click', function (e) {
+    const b = e.target.closest('[data-goto]');
+    if (b && !b.disabled) goto(parseInt(b.dataset.goto, 10));
+  });
+  function goto(n) {
+    S.step = n; S.maxStep = Math.max(S.maxStep, n); UI.navWarn = null;
+    if (n === 2) startTimers();
+    save(); render();
+    const h = document.getElementById('step-h');
+    if (h) h.focus();
+    window.scrollTo(0, 0);
+  }
+  function goNext(force) {
+    const m = missing(S.step);
+    if (m.block.length) { UI.navWarn = { block: true, items: m.block }; UI.focus = 'navwarn'; render(); announce('Before you move on: ' + m.block.join(' ')); return; }
+    if (m.soft.length && !force) { UI.navWarn = { block: false, items: m.soft }; UI.focus = 'navwarn'; render(); announce('Not finished yet: ' + m.soft.join(' ') + ' You can continue anyway.'); return; }
+    goto(S.step + 1);
+  }
+  function navButtons(n) {
+    let h = '';
+    if (UI.navWarn) {
+      h += '<div class="warn" id="navwarn" tabindex="-1"><strong>' + (UI.navWarn.block ? 'Before you move on:' : 'Some parts are not finished:') + '</strong><ul>' +
+        UI.navWarn.items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
+        (UI.navWarn.block ? '' : '<p>You can come back to them later. Your PDF will show what was finished.</p><button type="button" data-action="next" data-force="1">Continue anyway</button>') + '</div>';
+    }
+    h += '<div class="nav">' + (n > 1 ? '<button type="button" data-action="back">← Back: ' + STEPS[n - 1].name + '</button>' : '<span></span>') +
+      (n < 5 ? '<button type="button" class="primary" data-action="next">Next: ' + STEPS[n + 1].name + ' →</button>' : '') + '</div>';
+    return h;
+  }
+  function hdr(n, intro) {
+    return '<header class="stephead"><p class="stepnum">Step ' + n + ' of 5 · about ' + STEPS[n].min + ' minutes</p><h2 id="step-h" tabindex="-1">' + STEPS[n].name + '</h2>' + (intro ? '<p class="lead">' + intro + '</p>' : '') + '</header>';
+  }
+
+  // ---------- Step 1 ----------
+  function countTable(caption, blanks) {
+    let h = '<div class="tablewrap"><table class="data"><caption>' + caption + '</caption><thead><tr><th scope="col">Place</th><th scope="col" class="num">People counted, January 2024</th></tr></thead><tbody>';
+    PLACES.forEach(function (p) {
+      let cell = fmt(p.count);
+      if (blanks && blanks.indexOf(p.id) >= 0) {
+        const it = vItem(p.id);
+        if (it.status === 'verified') cell = fmt(p.count) + ' <span class="ok-mark">✓ checked by you</span>';
+        else if (it.status === 'revealed') cell = fmt(p.count) + ' <span class="small">(shown by the tool)</span>';
+        else cell = '<span class="blank" aria-label="hidden: find this number">?</span>';
+      }
+      h += '<tr><th scope="row">' + p.name + '</th><td class="num">' + cell + '</td></tr>';
+    });
+    return h + '</tbody></table></div>';
+  }
+  function renderStep1() {
+    let h = hdr(1, 'A <strong>Point-in-Time count</strong> is a count of people experiencing homelessness on one night in late January. Each area runs its own count and reports it to HUD, the U.S. Department of Housing and Urban Development.');
+    h += '<div class="card">' + countTable('People experiencing homelessness counted in the 2024 Point-in-Time count') +
+      '<p class="srcnote">Source: HUD, 2024 Point-in-Time count reports for each area. <button type="button" class="linkbtn" data-action="sources">See all sources</button></p></div>';
+    if (!S.pickLocked) {
+      h += '<div class="card"><fieldset><legend>Which place do you think has the most homelessness?</legend><div class="choices">';
+      PLACES.forEach(function (p) {
+        h += '<label><input type="radio" name="pick" id="pick-' + p.id + '" value="' + p.id + '"' + (S.pick === p.id ? ' checked' : '') + '><span>' + p.name + '</span></label>';
+      });
+      h += '</div></fieldset><div class="field"><label for="pickWhy">In one sentence, why did you pick it?</label><textarea id="pickWhy" data-bind="pickWhy" rows="2">' + esc(S.pickWhy) + '</textarea></div>' +
+        '<button type="button" class="primary" data-action="lockPick" id="btnLock">Lock in my answer</button>' + fbHTML('pick') + '</div>';
+    } else {
+      h += '<div class="lockcard" id="lockedPick" tabindex="-1"><p><strong>Your answer is locked in:</strong> ' + esc(placeName(S.pick)) + '</p><p><strong>Your reason:</strong> “' + esc(S.pickWhy) + '”</p><p class="small">You will see this again in Step 4.</p>' +
+        (S.maxStep === 1 ? '<button type="button" data-action="unlockPick">Change my answer</button>' : '') + '</div>';
+    }
+    return h + navButtons(1);
+  }
+
+  // ---------- Step 2 ----------
+  function startTimers() {
+    verifyTargets().forEach(function (id) { const it = vItem(id); if (it.status === 'open' && !it.started) it.started = Date.now(); });
+  }
+  function whereSteps(p) {
+    return '<ol><li>Open the report: ' + ext(p.pdf, '2024 HUD report for ' + p.name + ' (PDF)') + '. The top of the page should say <strong>' + esc(p.cocName) + '</strong>. (CoC means “Continuum of Care,” the local group that runs the count.)</li>' +
+      '<li>On page 1, find the row named <strong>Total Homeless Persons</strong>.</li>' +
+      '<li>Read across that row to the <strong>Total</strong> column at the right. That is everyone counted: people in emergency shelter, in transitional housing, and unsheltered.</li></ol>' +
+      '<p>Want to find the report yourself? HUD lists every report here: ' + ext(L.HUD_PAGE, 'CoC Homeless Populations and Subpopulations Reports') + '. You can also search for <code>' + esc(L.HUD_PHRASE) + '</code>.</p>';
+  }
+  function verifyCard(id) {
+    const p = L.byId(id), it = vItem(id);
+    let h = '<div class="card" id="v-' + id + '"><h3>Find: people counted in ' + esc(p.name) + ', 2024</h3>' +
+      '<dl class="find"><dt>Open the report</dt><dd>' + ext(p.pdf, '2024 HUD report for ' + p.name + ' (PDF)') + '</dd>' +
+      '<dt>Look for</dt><dd>Page 1, the row <strong>Total Homeless Persons</strong>, the <strong>Total</strong> column</dd>' +
+      '<dt>Published by</dt><dd>HUD (U.S. Department of Housing and Urban Development) · ' + esc(p.cocName) + '</dd></dl>';
+    if (it.status === 'verified') {
+      h += '<p class="fb fb-ok" id="vres-' + id + '" tabindex="-1"><strong>✓ Verified by you.</strong> You found ' + fmt(p.count) + ' in the HUD report. It matches the table.</p>';
+    } else if (it.status === 'revealed') {
+      h += '<p class="fb fb-info" id="vres-' + id + '" tabindex="-1"><strong>ℹ Shown by the tool.</strong> The HUD report lists ' + fmt(p.count) + ' people. Your PDF will note that you did not check this number yourself.</p>';
+    } else {
+      h += '<div class="field"><label for="vin-' + id + '">Total people counted in ' + esc(p.name) + '</label><div class="row">' +
+        '<input type="text" id="vin-' + id + '" data-vin="' + id + '" data-enter="verifyCheck" data-id="' + id + '" inputmode="numeric" autocomplete="off" value="' + esc(it.value) + '" aria-describedby="fb-v-' + id + '" style="width:10rem">' +
+        '<button type="button" data-action="verifyCheck" data-id="' + id + '">Check</button></div></div>' + fbHTML('v-' + id) +
+        '<p class="offer" id="offer-' + id + '"' + (it.offered && !it.hintOpen ? '' : ' hidden') + '>Taking a while? The “Show me where” steps can help.</p>' +
+        '<div class="row"><button type="button" data-action="toggleWhere" data-id="' + id + '" id="where-btn-' + id + '" aria-expanded="' + (it.hintOpen ? 'true' : 'false') + '" aria-controls="where-' + id + '">' + (it.hintOpen ? 'Hide the steps' : 'Show me where') + '</button>' +
+        '<button type="button" data-action="cantOpen" data-id="' + id + '" id="cant-btn-' + id + '">I can’t open this site</button></div>' +
+        '<div class="hintbox" id="where-' + id + '"' + (it.hintOpen ? '' : ' hidden') + '><p><strong>Where to find it:</strong></p>' + whereSteps(p) + '</div>';
+      if (UI.cantOpen[id]) {
+        h += '<div class="hintbox" id="cantbox-' + id + '" tabindex="-1"><p>If the report link above is blocked, you can see the number and keep going. Your PDF will show that this number was not checked by you.</p>' +
+          '<button type="button" data-action="reveal" data-id="' + id + '" id="reveal-btn-' + id + '">Show me the number</button></div>';
+      }
+    }
+    return h + '</div>';
+  }
+  function renderStep2() {
+    let h = hdr(2, 'Good data work starts with checking. Don’t just trust a table, even this one. Two numbers are hidden below. Open the original HUD report for each one, find the number and type it in.');
+    h += '<div class="card">' + countTable('People counted, January 2024 (two numbers hidden)', verifyTargets()) + '</div>';
+    const secondDone = S.second && vItem(S.second).status !== 'open';
+    if (!secondDone) {
+      h += '<div class="card"><fieldset><legend>King County is one of the hidden numbers. Choose one more place to check:</legend><div class="choices">';
+      PLACES.filter(function (p) { return p.id !== 'king'; }).forEach(function (p) {
+        h += '<label><input type="radio" name="second" id="second-' + p.id + '" value="' + p.id + '"' + (S.second === p.id ? ' checked' : '') + '><span>' + p.name + '</span></label>';
+      });
+      h += '</div></fieldset></div>';
+    }
+    h += '<div class="verify-grid">' + verifyTargets().map(verifyCard).join('') + '</div>';
+    return h + navButtons(2);
+  }
+
+  // ---------- Step 3 ----------
+  function exampleHTML() {
+    const q = US.count / US.pop, r = L.rate(US);
+    let h = '<div class="card example"><h3>Worked example: the whole United States</h3>' +
+      '<p>A <strong>rate per 10,000</strong> answers the question: “For every 10,000 people who live here, how many were counted as experiencing homelessness?” It lets us compare places with very different numbers of people.</p>' +
+      '<p class="formula">rate per 10,000 = (people counted ÷ population) × 10,000</p>' +
+      '<p>United States, 2024: <strong>' + fmt(US.count) + '</strong> people counted. Population: <strong>' + fmt(US.pop) + '</strong>.</p><ol class="steps">';
+    if (S.usShown >= 1) h += '<li>Divide: ' + fmt(US.count) + ' ÷ ' + fmt(US.pop) + ' = ' + L.formatCalc(q) + '… (people counted for each 1 person)</li>';
+    if (S.usShown >= 2) h += '<li>Multiply by 10,000: ' + L.formatCalc(q) + ' × 10,000 ≈ ' + fmt(r, 2) + '</li>';
+    if (S.usShown >= 3) h += '<li>Round: about <strong>' + fmt(Math.round(r), 0) + ' people per 10,000</strong>.</li>';
+    h += '</ol>';
+    if (S.usShown >= 3) {
+      h += '<div class="hintbox" id="ex-check" tabindex="-1"><p><strong>Check it against the source.</strong> HUD’s own national report says that 771,480 people, “or about 23 of every 10,000 people in the United States,” experienced homelessness in January 2024. Compare that with the result above.</p>' +
+        '<p class="small">Fine print: HUD’s U.S. count also includes U.S. territories and Puerto Rico. This population number covers the 50 states and DC.</p></div>';
+    } else {
+      h += '<button type="button" data-action="usNext" id="usNext">' + (S.usShown === 0 ? 'Show step 1' : 'Show step ' + (S.usShown + 1)) + '</button>';
+    }
+    return h + '</div>';
+  }
+  function rateTable() {
+    let h = '<div class="tablewrap"><table class="data"><caption>Your table: people counted, population and rate per 10,000</caption><thead><tr><th scope="col">Place</th><th scope="col" class="num">People counted (2024)</th><th scope="col" class="num">Population (July 1, 2024)</th><th scope="col">Your rate per 10,000</th></tr></thead><tbody>';
+    h += '<tr class="example"><th scope="row">United States (example)</th><td class="num">' + fmt(US.count) + '</td><td class="num">' + fmt(US.pop) + '</td><td>' + (S.usShown >= 3 ? 'about ' + fmt(Math.round(L.rate(US)), 0) : 'see the worked example') + '</td></tr>';
+    PLACES.forEach(function (p, i) {
+      const it = rItem(p.id);
+      let cell;
+      if (it.status === 'correct') cell = '<span class="ok-mark" id="rres-' + p.id + '" tabindex="-1">✓ ' + esc(it.value) + '</span>';
+      else if (it.status === 'revealed') cell = '<span id="rres-' + p.id + '" tabindex="-1">' + fmt(studentRate(p.id), 1) + ' <span class="small">(shown by the tool)</span></span>';
+      else {
+        cell = '<div class="row"><label class="sr-only" for="rin-' + p.id + '">Rate per 10,000 for ' + esc(p.name) + '</label>' +
+          '<input type="text" class="rate-in" id="rin-' + p.id + '" data-rin="' + p.id + '" data-enter="rateCheck" data-id="' + p.id + '" inputmode="decimal" autocomplete="off" value="' + esc(it.value) + '" aria-describedby="fb-r-' + p.id + '">' +
+          '<button type="button" data-action="rateCheck" data-id="' + p.id + '" aria-label="Check the rate for ' + esc(p.name) + '">Check</button>' +
+          (it.tries >= 4 ? '<button type="button" data-action="rateReveal" data-id="' + p.id + '" aria-label="Show me the answer for ' + esc(p.name) + '">Show me the answer</button>' : '') + '</div>';
+      }
+      h += '<tr><th scope="row">' + p.name + '</th><td class="num">' + fmt(p.count) + '</td><td class="num">' + fmt(p.pop) + '</td><td>' + cell + '</td></tr>';
+      if (UI.fb['r-' + p.id]) h += '<tr class="fbrow"><td colspan="4">' + fbHTML('r-' + p.id) + '</td></tr>';
+      else h += '<tr class="sr-only"><td colspan="4"><p id="fb-r-' + p.id + '"></p></td></tr>';
+    });
+    h += '</tbody></table></div><p class="srcnote">People counted: HUD 2024 Point-in-Time counts. Population: U.S. Census Bureau estimates for July 1, 2024 (County Population Totals 2020–2025). <button type="button" class="linkbtn" data-action="sources">See all sources</button></p>' +
+      '<p class="small">Round your answers to a whole number or one decimal place. Use the calculator if you like.</p>';
+    return h;
+  }
+  function calcHTML() {
+    return '<aside class="calc" aria-labelledby="calc-h"><h3 id="calc-h">Calculator</h3>' +
+      '<label for="calc-in">Type a calculation, then press Enter</label>' +
+      '<input type="text" id="calc-in" data-enter="calc" autocomplete="off" spellcheck="false" value="' + esc(UI.calcIn) + '" placeholder="like 12 ÷ 3 × 100" aria-describedby="calc-help">' +
+      '<div class="row" style="margin-top:.4rem"><button type="button" class="primary" data-action="calc">= Calculate</button><button type="button" data-action="calcClear">Clear</button></div>' +
+      '<p class="calcout" id="calc-out" aria-live="off">' + (UI.calcOut ? esc(UI.calcOut) : '—') + '</p>' +
+      '<p class="small" id="calc-help">Use + − × ÷ (or * and / and x) and parentheses. Commas inside big numbers are fine.</p>' +
+      (UI.calcHist.length ? '<p class="small" style="margin-bottom:0"><strong>Recent:</strong></p><ul>' + UI.calcHist.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+      '</aside>';
+  }
+
+  const G = { W: 640, H: 430, L: 84, R: 16, T: 50, B: 86 };
+  G.pw = G.W - G.L - G.R; G.ph = G.H - G.T - G.B; G.base = G.T + G.ph; G.slot = G.pw / PLACES.length; G.bw = G.slot * 0.58;
+  function valText(kind, v) { return kind === 'count' ? fmt(v, 0) : fmt(v, 1); }
+  function chartSVG(kind, interactive, pfx) {
+    const C = S.charts[kind], sc = C.scale;
+    const color = kind === 'count' ? 'var(--bar1)' : 'var(--bar2)';
+    const desc = sc ? PLACES.map(function (p) { return p.short + ': ' + (C.bars[p.id] ? valText(kind, C.bars[p.id]) : 'not set'); }).join('; ') : 'No scale set yet.';
+    let o = '<svg viewBox="0 0 ' + G.W + ' ' + G.H + '" class="chart' + (interactive ? ' interactive' : '') + '" role="' + (interactive ? 'group' : 'img') + '" aria-labelledby="' + pfx + '-t" aria-describedby="' + pfx + '-d" xmlns="http://www.w3.org/2000/svg">';
+    o += '<desc id="' + pfx + '-d">Bar chart. ' + esc(C.ylabel || 'Vertical axis not labeled') + '. ' + esc(desc) + '</desc>';
+    // Long student-typed labels are squeezed to fit rather than running off the chart.
+    const fitT = (C.title || '').length > 62 ? ' textLength="' + (G.W - 24) + '" lengthAdjust="spacingAndGlyphs"' : '';
+    const fitY = (C.ylabel || '').length > 38 ? ' textLength="' + (G.ph + G.T - 10) + '" lengthAdjust="spacingAndGlyphs"' : '';
+    o += '<text id="' + pfx + '-t" class="c-title" x="' + (G.W / 2) + '" y="26" text-anchor="middle"' + fitT + '>' + esc(C.title || '(Your chart title)') + '</text>';
+    o += '<text id="' + pfx + '-y" class="c-axis" text-anchor="middle" transform="translate(18 ' + (G.T + G.ph / 2) + ') rotate(-90)"' + fitY + '>' + esc(C.ylabel || '(vertical axis label)') + '</text>';
+    o += '<text id="' + pfx + '-x" class="c-axis" x="' + (G.L + G.pw / 2) + '" y="' + (G.H - 8) + '" text-anchor="middle">' + esc(C.xlabel || '(horizontal axis label)') + '</text>';
+    if (!sc) {
+      o += '<line class="axisline" x1="' + G.L + '" y1="' + G.T + '" x2="' + G.L + '" y2="' + G.base + '"/><line class="axisline" x1="' + G.L + '" y1="' + G.base + '" x2="' + (G.W - G.R) + '" y2="' + G.base + '"/>';
+      o += '<text class="c-placeholder" x="' + (G.L + G.pw / 2) + '" y="' + (G.T + G.ph / 2) + '" text-anchor="middle">Set the scale to start drawing.</text>';
+    } else {
+      for (let i = 0; i <= sc.n; i++) {
+        const v = sc.st * i, y = G.base - v / sc.max * G.ph;
+        o += '<line class="grid" x1="' + G.L + '" y1="' + y.toFixed(2) + '" x2="' + (G.W - G.R) + '" y2="' + y.toFixed(2) + '"/>';
+        o += '<text class="c-tick" x="' + (G.L - 8) + '" y="' + (y + 4).toFixed(2) + '" text-anchor="end">' + fmt(Math.round(v * 1e6) / 1e6, 3) + '</text>';
+      }
+      o += '<line class="axisline" x1="' + G.L + '" y1="' + G.T + '" x2="' + G.L + '" y2="' + G.base + '"/><line class="axisline" x1="' + G.L + '" y1="' + G.base + '" x2="' + (G.W - G.R) + '" y2="' + G.base + '"/>';
+    }
+    PLACES.forEach(function (p, i) {
+      const cx = G.L + G.slot * i + G.slot / 2;
+      const v = (sc && C.bars[p.id]) || 0, hgt = sc ? v / sc.max * G.ph : 0;
+      o += '<rect id="' + pfx + '-bar-' + p.id + '" x="' + (cx - G.bw / 2).toFixed(2) + '" y="' + (G.base - hgt).toFixed(2) + '" width="' + G.bw.toFixed(2) + '" height="' + hgt.toFixed(2) + '" fill="' + color + '"/>';
+      o += '<text id="' + pfx + '-val-' + p.id + '" class="c-val" x="' + cx.toFixed(2) + '" y="' + (G.base - hgt - 6).toFixed(2) + '" text-anchor="middle">' + (v ? valText(kind, v) : '') + '</text>';
+      const words = p.short.split(' ');
+      o += '<text class="c-name" x="' + cx.toFixed(2) + '" y="' + (G.base + 18) + '" text-anchor="middle">' + words.map(function (w, k) { return '<tspan x="' + cx.toFixed(2) + '" dy="' + (k ? 15 : 0) + '">' + esc(w) + '</tspan>'; }).join('') + '</text>';
+      let mark = '';
+      if (C.lastCheck && C.lastCheck[p.id] && C.lastCheck[p.id] !== 'ok') mark = C.lastCheck[p.id] === 'unset' ? 'not set' : (C.lastCheck[p.id] === 'high' ? '✗ too high' : '✗ too low');
+      o += '<text id="' + pfx + '-mk-' + p.id + '" class="c-mark" x="' + cx.toFixed(2) + '" y="' + (G.base + 52) + '" text-anchor="middle">' + mark + '</text>';
+      if (interactive && sc) {
+        o += '<rect class="hit" id="' + pfx + '-hit-' + p.id + '" data-kind="' + kind + '" data-id="' + p.id + '" x="' + (G.L + G.slot * i + 3).toFixed(2) + '" y="' + G.T + '" width="' + (G.slot - 6).toFixed(2) + '" height="' + G.ph + '" fill="#000" fill-opacity="0" pointer-events="all" tabindex="0" role="slider" aria-orientation="vertical"' +
+          ' aria-label="Bar for ' + esc(p.name) + '" aria-valuemin="0" aria-valuemax="' + sc.max + '" aria-valuenow="' + v + '" aria-valuetext="' + (v ? valText(kind, v) : '0, not set') + '"/>';
+      }
+    });
+    return o + '</svg>';
+  }
+  function updateBarDOM(kind, id, src) {
+    const C = S.charts[kind], sc = C.scale, pfx = 'cb-' + kind;
+    const v = C.bars[id] || 0, hgt = v / sc.max * G.ph;
+    const bar = document.getElementById(pfx + '-bar-' + id), val = document.getElementById(pfx + '-val-' + id), hit = document.getElementById(pfx + '-hit-' + id);
+    if (bar) { bar.setAttribute('y', (G.base - hgt).toFixed(2)); bar.setAttribute('height', hgt.toFixed(2)); }
+    if (val) { val.setAttribute('y', (G.base - hgt - 6).toFixed(2)); val.textContent = v ? valText(kind, v) : ''; }
+    if (hit) { hit.setAttribute('aria-valuenow', v); hit.setAttribute('aria-valuetext', v ? valText(kind, v) : '0, not set'); }
+    PLACES.forEach(function (p) { const mk = document.getElementById(pfx + '-mk-' + p.id); if (mk && !C.lastCheck) mk.textContent = ''; });
+    if (src !== 'type') { const inp = document.getElementById(pfx + '-in-' + id); if (inp) inp.value = v ? String(Math.round(v * 1e4) / 1e4) : ''; }
+  }
+  function setBar(kind, id, v, src) {
+    const C = S.charts[kind];
+    if (!C.scale) return;
+    if (isNaN(v)) return;
+    v = Math.max(0, Math.min(C.scale.max, v));
+    v = Math.round(v * 1e6) / 1e6;
+    C.bars[id] = v;
+    C.lastCheck = null;
+    if (C.status === 'done') {
+      C.status = 'open';
+      UI.fb['chart-' + kind] = { kind: 'info', label: FB_LABEL.info, msg: 'You changed a bar. Press “Check my chart” again when you are ready.' };
+      const f = document.getElementById('fb-chart-' + kind);
+      if (f) { f.className = 'fb fb-info'; f.innerHTML = '<strong>' + FB_LABEL.info + '</strong> ' + esc(UI.fb['chart-' + kind].msg); }
+      renderNav();
+    }
+    updateBarDOM(kind, id, src);
+    save();
+  }
+  function chartCard(kind) {
+    const C = S.charts[kind], num = kind === 'count' ? 1 : 2;
+    const what = kind === 'count' ? 'People counted' : 'Rate per 10,000 people';
+    const pfx = 'cb-' + kind;
+    let h = '<section class="card chartcard" aria-labelledby="' + pfx + '-h"><h3 id="' + pfx + '-h">Chart ' + num + ': ' + what + '</h3>';
+    if (kind === 'rate' && !allRatesResolved()) {
+      return h + '<p>This chart uses the rates from your table. Finish the rate column in Part A first, then come back here.</p></section>';
+    }
+    h += '<p class="small">Use the ' + (kind === 'count' ? '“People counted”' : '“Your rate per 10,000”') + ' column of your table above.</p>';
+    h += '<div class="setup"><fieldset><legend>1. Choose the scale for the vertical axis</legend><div class="scaleins">' +
+      '<div class="field"><label for="' + pfx + '-max">Axis maximum</label><input type="text" id="' + pfx + '-max" data-bind="charts.' + kind + '.maxIn" data-enter="setScale" data-kind="' + kind + '" inputmode="decimal" autocomplete="off" value="' + esc(C.maxIn) + '"></div>' +
+      '<div class="field"><label for="' + pfx + '-step">Tick step</label><input type="text" id="' + pfx + '-step" data-bind="charts.' + kind + '.stepIn" data-enter="setScale" data-kind="' + kind + '" inputmode="decimal" autocomplete="off" value="' + esc(C.stepIn) + '" aria-describedby="' + pfx + '-stephelp"></div>' +
+      '<button type="button" data-action="setScale" data-kind="' + kind + '" id="' + pfx + '-setscale">Set scale</button></div>' +
+      '<p class="small" id="' + pfx + '-stephelp">The tick step is the space between labels on the axis. For example, a maximum of 50 with a step of 10 gives labels 0, 10, 20, 30, 40, 50.</p>' +
+      fbHTML('scale-' + kind) +
+      (C.scaleTries >= 3 && !C.scale ? (function () { const ns = L.niceScale(dataMax(kind)); return '<p class="hintbox">Want a suggestion? Try a maximum of <strong>' + fmt(ns.max, 3) + '</strong> with a step of <strong>' + fmt(ns.st, 3) + '</strong>. <button type="button" data-action="useSuggested" data-kind="' + kind + '" id="' + pfx + '-suggest">Use this scale</button></p>'; })() : '') +
+      (C.scaleTries === 2 && !C.scale ? '<p class="hintbox">Hint: look at your biggest value. Pick a round number a little above it for the maximum. Then pick a step that splits it into about 5 to 10 equal parts.</p>' : '') +
+      '</fieldset>';
+    h += '<fieldset><legend>2. Label your chart</legend>' +
+      '<div class="field"><label for="' + pfx + '-title">Chart title</label><input type="text" id="' + pfx + '-title" data-bind="charts.' + kind + '.title" data-svg="' + pfx + '-t" autocomplete="off" value="' + esc(C.title) + '"></div>' +
+      '<div class="field"><label for="' + pfx + '-ylabel">Vertical axis label (what the bar height means)</label><input type="text" id="' + pfx + '-ylabel" data-bind="charts.' + kind + '.ylabel" data-svg="' + pfx + '-y" autocomplete="off" value="' + esc(C.ylabel) + '"' + (kind === 'rate' ? ' aria-describedby="' + pfx + '-yhelp"' : '') + '></div>' +
+      (kind === 'rate' ? '<p class="small" id="' + pfx + '-yhelp">Your label should say what the rate is “per 10,000” of.</p>' : '') +
+      '<div class="field"><label for="' + pfx + '-xlabel">Horizontal axis label (what each bar stands for)</label><input type="text" id="' + pfx + '-xlabel" data-bind="charts.' + kind + '.xlabel" data-svg="' + pfx + '-x" autocomplete="off" value="' + esc(C.xlabel) + '"></div>' +
+      '</fieldset></div>';
+    h += '<div class="svgwrap">' + chartSVG(kind, true, pfx) + '</div>';
+    h += '<p class="small"><strong>3. Set each bar.</strong> Drag a bar up or down. Or press Tab to reach a bar and use the arrow keys (hold Shift to move one tick at a time). Or type the value in the boxes below.</p>';
+    h += '<div class="barins">' + PLACES.map(function (p) {
+      const v = C.bars[p.id];
+      return '<div><label for="' + pfx + '-in-' + p.id + '">' + esc(p.short) + ' bar</label><input type="text" id="' + pfx + '-in-' + p.id + '" data-bar-kind="' + kind + '" data-bar-id="' + p.id + '" inputmode="decimal" autocomplete="off" value="' + (v ? esc(String(Math.round(v * 1e4) / 1e4)) : '') + '"' + (C.scale ? '' : ' disabled') + '></div>';
+    }).join('') + '</div>' + fbHTML('barin-' + kind);
+    h += '<div class="row"><button type="button" class="primary" data-action="checkChart" data-kind="' + kind + '" id="' + pfx + '-check">Check my chart</button>' +
+      (C.checks >= 3 && C.status !== 'done' ? '<button type="button" data-action="fillBars" data-kind="' + kind + '" id="' + pfx + '-fill">Set the bars for me</button>' : '') + '</div>';
+    if (C.checks >= 2 && C.status !== 'done') h += '<p class="hintbox">Tip: the easiest way to get exact heights is to type each value from your table into the boxes under the chart.</p>';
+    h += fbHTML('chart-' + kind);
+    return h + '</section>';
+  }
+  function renderStep3() {
+    let h = hdr(3, 'Some places have far more people living in them than others. To compare fairly, you will add each place’s population and work out a <strong>rate per 10,000 people</strong>. Then you will build two bar charts.');
+    h += '<h3 class="parthead" style="border-top:0;margin-top:0;padding-top:0">Part A · Rates per 10,000 people</h3>';
+    h += '<div class="s3grid"><div>' + exampleHTML() + '<div class="card">' + rateTable() + '</div></div>' + calcHTML() + '</div>';
+    h += '<h3 class="parthead">Part B · Build two bar charts</h3><p>Build one chart from the counts and one from your rates. You choose the scale and the labels.</p>';
+    h += chartCard('count') + chartCard('rate');
+    if (S.charts.count.status === 'done' && S.charts.rate.status === 'done') {
+      h += '<section class="card" aria-labelledby="both-h"><h3 id="both-h">Your two charts, side by side</h3><div class="donecharts"><div>' + chartSVG('count', false, 'sb-count') + '</div><div>' + chartSVG('rate', false, 'sb-rate') + '</div></div></section>';
+    }
+    return h + navButtons(3);
+  }
+
+  // ---------- Step 4 ----------
+  function rankings() {
+    const byCount = PLACES.slice().sort(function (a, b) { return b.count - a.count; });
+    const byRate = PLACES.slice().sort(function (a, b) { return (studentRate(b.id) || 0) - (studentRate(a.id) || 0); });
+    return { byCount: byCount, byRate: byRate };
+  }
+  function rankList(list, kind) {
+    return '<ol>' + list.map(function (p) {
+      const v = kind === 'count' ? fmt(p.count) : (studentRate(p.id) === null ? 'not finished' : fmt(studentRate(p.id), 2) + ' per 10,000');
+      const pick = p.id === S.pick;
+      return '<li' + (pick ? ' class="pick"' : '') + '><span>' + esc(p.name) + (pick ? ' <span class="tag">★ Your Step 1 pick</span>' : '') + '</span><span class="val">' + v + '</span></li>';
+    }).join('') + '</ol>';
+  }
+  function qField(key, label, rows) {
+    return '<div class="field"><label for="ans-' + key + '">' + label + '</label><textarea id="ans-' + key + '" data-bind="ans.' + key + '" rows="' + (rows || 3) + '">' + esc(S.ans[key]) + '</textarea></div>';
+  }
+  function caveatsHTML() {
+    return '<div class="reading" aria-labelledby="read-h"><h3 id="read-h">Reading: How this was counted</h3><ul>' +
+      '<li><strong>One night only.</strong> Each count happened on one night in the last 10 days of January 2024. It is a snapshot of that night. It is not a count of everyone who experiences homelessness during the year.</li>' +
+      '<li><strong>Each place chooses its own method.</strong> HUD lets each area choose from approved counting methods, so “there is no universal method used to collect PIT count data.” Some areas try to count everyone. Others survey a sample of people and estimate. King County uses a survey-based estimate.</li>' +
+      '<li><strong>The real number could be larger.</strong> HUD says “the actual number of people experiencing unsheltered homelessness could be larger than reported.” (Unsheltered means staying in places not meant for people to live, such as streets, vehicles or parks.)</li>' +
+      '<li><strong>Some people are not counted at all.</strong> The count includes people in shelters, in transitional housing, and in places not meant for people to live. People staying “doubled up” with friends or family are not counted.</li>' +
+      '</ul><p class="small">Sources: HUD, 2024 Annual Homelessness Assessment Report (AHAR), Part 1; HUD 2024 Point-in-Time count reports. <button type="button" class="linkbtn" data-action="sources">See all sources</button></p></div>';
+  }
+  function renderStep4() {
+    const r = rankings();
+    let h = hdr(4, 'Here are the six places ranked two ways, using the numbers from your own table.');
+    h += '<div class="card"><p><strong>Your Step 1 answer:</strong> ' + (S.pick ? esc(placeName(S.pick)) : '(none)') + (S.pickWhy ? ' — “' + esc(S.pickWhy) + '”' : '') + '</p>' +
+      '<div class="rankings"><div><h3>Ranked by people counted</h3>' + rankList(r.byCount, 'count') + '</div><div><h3>Ranked by rate per 10,000</h3>' + rankList(r.byRate, 'rate') + '</div></div></div>';
+    h += '<div class="card">' +
+      qField('q1', 'Question 1. Did the ranking change from counts to rates? Does your Step 1 answer still hold up? Explain.') +
+      qField('q2', 'Question 2. Why can counts and rates tell different stories? Use at least two numbers from your table.') + '</div>';
+    h += '<div class="card">' + caveatsHTML();
+    if (S.readCaveats) h += qField('q3', 'Question 3. Who might this count miss? Use the reading to explain.');
+    else h += '<p><button type="button" data-action="readCaveats" id="btnRead">I read this. Show Question 3.</button></p>';
+    h += '</div>';
+    return h + navButtons(4);
+  }
+
+  // ---------- Step 5 ----------
+  let inFrame = false;
+  try { inFrame = window.self !== window.top; } catch (e) { inFrame = true; }
+  function renderStep5() {
+    let h = hdr(5, 'Think about what the data means. There are no right or wrong answers here.');
+    h += '<div class="card">' + qField('r1', '1. What surprised you in this data? Why?') +
+      '<div class="field"><label for="ans-r2">2. What does this data mean to you or to your community?</label>' +
+      '<p class="care" id="r2-care">Share only what you are comfortable sharing. You do not need to write about yourself or your family. You can write about the data, your city or what you have noticed.</p>' +
+      '<textarea id="ans-r2" data-bind="ans.r2" rows="3" aria-describedby="r2-care"' + (S.ans.r2skip ? ' disabled' : '') + '>' + esc(S.ans.r2skip ? '' : S.ans.r2) + '</textarea>' +
+      '<label class="check"><input type="checkbox" id="r2skip" data-check="r2skip"' + (S.ans.r2skip ? ' checked' : '') + '> I’d rather not share this one.</label></div>' +
+      qField('r3', '3. What question would you want data to answer next?') + '</div>';
+    h += '<div class="card savebox"><h3>Save my work as a PDF</h3>' +
+      '<p>Type your name here so your teacher knows whose work this is. Your name is not saved in the browser.</p>' +
+      '<div class="field"><label for="studentName">Your name</label><input type="text" id="studentName" data-name="1" autocomplete="name" value="' + esc(UI.name) + '" style="width:min(100%,22rem)"></div>' +
+      '<button type="button" class="primary" data-action="savePdf" id="btnSave">Save my work as a PDF</button>' + fbHTML('save') +
+      '<p class="small"><strong>In the print window:</strong> on a Chromebook, set Destination to “Save as PDF”; on Windows, choose “Microsoft Print to PDF” (or “Save as PDF”) as the printer. Then click Save.</p>' +
+      (inFrame ? '<p class="small">This page is running inside another page. If no print window opens, ' + ext(location.href, 'open this page in its own tab') + ' and try again. Work typed here does not carry over to the new tab.</p>' : '') +
+      '</div>';
+    return h + navButtons(5);
+  }
+
+  // ---------- Report (print) ----------
+  function completion() {
+    const out = [];
+    out.push('Step 1, first answer: ' + (S.pickLocked ? 'locked in' : 'not done'));
+    verifyTargets().forEach(function (id) {
+      const st = vItem(id).status;
+      out.push('Step 2, ' + placeName(id) + ' number: ' + (st === 'verified' ? 'checked in the HUD report by me' : st === 'revealed' ? 'shown by the tool (NOT checked by me)' : 'not done'));
+    });
+    if (!S.second) out.push('Step 2, second place: not chosen');
+    const mine = PLACES.filter(function (p) { return rItem(p.id).status === 'correct'; }).length;
+    const shown = PLACES.filter(function (p) { return rItem(p.id).status === 'revealed'; }).map(function (p) { return p.short; });
+    out.push('Step 3, rates per 10,000: ' + mine + ' of 6 worked out by me' + (shown.length ? '; shown by the tool: ' + shown.join(', ') : '') + (mine + shown.length < 6 ? '; ' + (6 - mine - shown.length) + ' not done' : ''));
+    ['count', 'rate'].forEach(function (k) {
+      const C = S.charts[k];
+      out.push('Step 3, chart of ' + (k === 'count' ? 'people counted' : 'rates per 10,000') + ': ' + (C.status === 'done' ? (C.filled ? 'finished; bar heights set by the tool' : 'finished and checked') : 'not finished'));
+    });
+    const q = ['q1', 'q2', 'q3'].filter(function (k) { return S.ans[k].trim(); }).length;
+    out.push('Step 4, questions answered: ' + q + ' of 3');
+    const r = (S.ans.r1.trim() ? 1 : 0) + (S.ans.r2skip || S.ans.r2.trim() ? 1 : 0) + (S.ans.r3.trim() ? 1 : 0);
+    out.push('Step 5, reflections answered: ' + r + ' of 3' + (S.ans.r2skip ? ' (chose not to share one)' : ''));
+    return out;
+  }
+  function ansBlock(label, text, skipped) {
+    return '<div class="rp-block"><p><strong>' + esc(label) + '</strong></p><div class="rp-ans">' + (skipped ? '<em>I chose not to share this one.</em>' : (text && text.trim() ? esc(text) : '<em>(not answered)</em>')) + '</div></div>';
+  }
+  function buildReport() {
+    const name = (UI.name || '').trim();
+    const d = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const r = rankings();
+    let h = '<h1>Which place has the most homelessness? My work</h1>' +
+      '<p class="rp-meta"><strong>Name:</strong> ' + (esc(name) || '(no name typed)') + ' &nbsp;&nbsp; <strong>Date:</strong> ' + d + '</p>' +
+      '<p class="small">Lesson 1: rates per 10,000 people. Data: HUD 2024 Point-in-Time counts; U.S. Census Bureau population estimates for July 1, 2024.</p>';
+    h += '<h2>What I completed</h2><ul>' + completion().map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+    h += '<h2>Step 1: My first answer</h2><p><strong>Place I picked:</strong> ' + (S.pick ? esc(placeName(S.pick)) : '(none)') + '</p>' + ansBlock('Why I picked it', S.pickWhy);
+    h += '<h2>My table</h2><table><thead><tr><th>Place</th><th class="num">People counted (2024)</th><th>Where the count came from</th><th class="num">Population (July 1, 2024)</th><th class="num">My rate per 10,000</th><th>How I got the rate</th></tr></thead><tbody>';
+    PLACES.forEach(function (p) {
+      let src = 'Given in the table';
+      if (verifyTargets().indexOf(p.id) >= 0) {
+        const st = vItem(p.id).status;
+        src = st === 'verified' ? 'Checked in the HUD report by me' : st === 'revealed' ? 'Shown by the tool (not checked by me)' : 'Not checked (not finished)';
+      }
+      const ri = rItem(p.id), sr = studentRate(p.id);
+      const how = ri.status === 'correct' ? 'Worked out by me' + (ri.tries > 1 ? ' (' + ri.tries + ' tries)' : '') : ri.status === 'revealed' ? 'Shown by the tool after ' + ri.tries + ' tries' : 'Not finished';
+      h += '<tr><td>' + esc(p.name) + '</td><td class="num">' + fmt(p.count) + '</td><td>' + src + '</td><td class="num">' + fmt(p.pop) + '</td><td class="num">' + (sr === null ? '—' : esc(ri.status === 'correct' ? ri.value : fmt(sr, 1))) + '</td><td>' + how + '</td></tr>';
+    });
+    h += '</tbody></table>';
+    h += '<h2>My charts</h2><div class="rp-charts">' + ['count', 'rate'].map(function (k) {
+      const C = S.charts[k];
+      const head = '<p><strong>Chart ' + (k === 'count' ? '1: people counted' : '2: rate per 10,000') + '</strong> (' + (C.status === 'done' ? (C.filled ? 'finished; bar heights set by the tool' : 'finished and checked') : 'not finished') + ')</p>';
+      return '<div>' + head + (C.scale ? chartSVG(k, false, 'rp-' + k) : '<p><em>No scale was set, so this chart was not drawn.</em></p>') + '</div>';
+    }).join('') + '</div>';
+    h += '<h2>Rankings from my table</h2><p class="small">★ marks my Step 1 pick.</p><div class="rp-rank"><div><p><strong>By people counted</strong></p><ol>' +
+      r.byCount.map(function (p) { return '<li>' + (p.id === S.pick ? '★ <strong>' : '') + esc(p.name) + ': ' + fmt(p.count) + (p.id === S.pick ? '</strong>' : '') + '</li>'; }).join('') + '</ol></div><div><p><strong>By rate per 10,000</strong></p><ol>' +
+      r.byRate.map(function (p) { const v = studentRate(p.id); return '<li>' + (p.id === S.pick ? '★ <strong>' : '') + esc(p.name) + ': ' + (v === null ? 'not finished' : fmt(v, 2)) + (p.id === S.pick ? '</strong>' : '') + '</li>'; }).join('') + '</ol></div></div>';
+    h += '<h2>Step 4: Analyze</h2>' +
+      ansBlock('1. Did the ranking change from counts to rates? Does my Step 1 answer still hold up?', S.ans.q1) +
+      ansBlock('2. Why can counts and rates tell different stories?', S.ans.q2) +
+      ansBlock('3. Who might this count miss?', S.ans.q3);
+    h += '<h2>Step 5: Reflect</h2>' +
+      ansBlock('1. What surprised me', S.ans.r1) +
+      ansBlock('2. What this data means to me or my community', S.ans.r2, S.ans.r2skip) +
+      ansBlock('3. A question I want data to answer next', S.ans.r3);
+    h += '<h2>Sources</h2><p class="small">People counted: HUD, 2024 CoC Homeless Populations and Subpopulations Reports (' + esc(L.HUD_PAGE) + '). Population: U.S. Census Bureau, County Population Totals 2020–2025 and State Population Totals 2020–2025 (Vintage 2025), July 1, 2024 estimates (' + esc(CENSUS_COUNTY_PAGE) + '). U.S. rate check: HUD, 2024 AHAR Part 1 (' + esc(AHAR_URL) + '). Numbers checked against these sources on ' + DATE_CHECKED + '.</p>';
+    document.getElementById('report').innerHTML = h;
+  }
+  window.addEventListener('beforeprint', buildReport);
+
+  // ---------- Sources panel ----------
+  function buildSources() {
+    let h = '<p>Every number in this activity comes from a public government source. Each was checked against the source on ' + DATE_CHECKED + '. The search phrase is what you can type into a search engine to find the source yourself.</p>';
+    h += '<h3>People counted (2024 Point-in-Time count)</h3><div class="tablewrap"><table class="data"><thead><tr><th scope="col">Place</th><th scope="col" class="num">Number</th><th scope="col">Source</th><th scope="col">Year</th><th scope="col">Link</th><th scope="col">Search phrase</th></tr></thead><tbody>';
+    PLACES.forEach(function (p) {
+      h += '<tr><th scope="row">' + esc(p.name) + '</th><td class="num">' + fmt(p.count) + '</td><td>HUD, CoC Homeless Populations and Subpopulations Report: ' + esc(p.cocName) + ', “Total Homeless Persons,” Total column</td><td>2024 (count date ' + p.pitDate + ')</td><td>' + ext(p.pdf, p.coc + ' report (PDF)') + '<br>' + ext(L.HUD_PAGE, 'All HUD reports') + '</td><td><code>' + esc(L.HUD_PHRASE) + '</code></td></tr>';
+    });
+    h += '<tr><th scope="row">United States</th><td class="num">' + fmt(US.count) + '</td><td>HUD, CoC Homeless Populations and Subpopulations Report: Full Summary Report (all states, territories, Puerto Rico and DC)</td><td>2024</td><td>' + ext(US.pdf, 'National report (PDF)') + '</td><td><code>' + esc(L.HUD_PHRASE) + '</code></td></tr>';
+    h += '</tbody></table></div>';
+    h += '<h3>Population (July 1, 2024 estimates)</h3><div class="tablewrap"><table class="data"><thead><tr><th scope="col">Place</th><th scope="col" class="num">Number</th><th scope="col">Source</th><th scope="col">Year</th><th scope="col">Link</th><th scope="col">Search phrase</th></tr></thead><tbody>';
+    PLACES.forEach(function (p) {
+      h += '<tr><th scope="row">' + esc(p.name) + '</th><td class="num">' + fmt(p.pop) + '</td><td>U.S. Census Bureau, County Population Totals and Components of Change: 2020–2025 (Vintage 2025), file CO-EST2025-alldata</td><td>July 1, 2024</td><td>' + ext(CENSUS_COUNTY_PAGE, 'Census page') + '<br>' + ext(CENSUS_COUNTY_CSV, 'Data file (CSV)') + '</td><td><code>census county population totals 2020-2025 datasets</code></td></tr>';
+    });
+    h += '<tr><th scope="row">United States (50 states + DC)</th><td class="num">' + fmt(US.pop) + '</td><td>U.S. Census Bureau, State Population Totals: 2020–2025 (Vintage 2025), file NST-EST2025-ALLDATA</td><td>July 1, 2024</td><td>' + ext(CENSUS_STATE_CSV, 'Data file (CSV)') + '</td><td><code>census state population totals 2020-2025</code></td></tr>';
+    h += '</tbody></table></div>';
+    h += '<h3>HUD’s published U.S. rate (for checking the worked example)</h3><p>“A total of 771,480 people — or about 23 of every 10,000 people in the United States — experienced homelessness” in January 2024. Source: HUD, <em>The 2024 Annual Homelessness Assessment Report (AHAR) to Congress, Part 1</em> (December 2024). ' + ext(AHAR_URL, 'AHAR Part 1 (PDF)') + '. Search phrase: <code>huduser 2024 AHAR Part 1</code>.</p>';
+    h += '<h3>“How this was counted” reading (Step 4)</h3><ul>' +
+      '<li>Count dates (last 10 days of January 2024): the HUD reports for each area, listed above.</li>' +
+      '<li>Methods differ by place, and the unsheltered number could be larger: HUD, 2024 AHAR Part 1. ' + ext(AHAR_URL, 'AHAR Part 1 (PDF)') + '. Search phrase: <code>huduser 2024 AHAR Part 1</code>.</li>' +
+      '<li>The count is a one-night snapshot: KCRHA, <em>2024 PIT Count FAQ</em>. ' + ext(KCRHA_FAQ_URL, 'KCRHA FAQ (PDF)') + '. Search phrase: <code>KCRHA Point-in-Time Count 2024 King County results</code>.</li>' +
+      '<li>Who is counted (sheltered, or in places not meant for people to live; people staying doubled up are not included): HUD’s Point-in-Time count definition.</li></ul>';
+    h += '<h3>Things to know about these numbers</h3><ul>' +
+      '<li>The count dates are in late January 2024. The population estimates are for July 1, 2024.</li>' +
+      '<li>HUD’s U.S. count includes U.S. territories and Puerto Rico. The Census U.S. population covers the 50 states and DC only.</li>' +
+      '<li>Each HUD count area (CoC) was matched to a county by its name. That match was made by the lesson’s researcher, not stated by HUD.</li></ul>';
+    document.getElementById('srcBody').innerHTML = h;
+  }
+
+  // ---------- Dialogs ----------
+  let dlgOpener = null;
+  function openDlg(id) {
+    const d = document.getElementById(id);
+    dlgOpener = document.activeElement;
+    if (typeof d.showModal === 'function') { try { d.showModal(); } catch (e) { d.setAttribute('open', ''); } }
+    else d.setAttribute('open', '');
+    const f = d.querySelector('button'); if (f) f.focus();
+  }
+  function closeDlg(d) {
+    if (typeof d.close === 'function') { try { d.close(); } catch (e) { d.removeAttribute('open'); } } else d.removeAttribute('open');
+  }
+  document.querySelectorAll('dialog').forEach(function (d) {
+    d.addEventListener('click', function (e) { if (e.target.closest('[data-close]')) closeDlg(d); });
+    d.addEventListener('close', function () { if (dlgOpener && document.contains(dlgOpener)) dlgOpener.focus(); });
+    d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !d.close) { d.removeAttribute('open'); } });
+  });
+  document.getElementById('btnSources').addEventListener('click', function () { buildSources(); openDlg('dlgSources'); });
+  document.getElementById('btnStartOver').addEventListener('click', function () { openDlg('dlgStartOver'); });
+  document.getElementById('soYes').addEventListener('click', function () {
+    clearStorage();
+    S = freshState();
+    UI.fb = {}; UI.navWarn = null; UI.calcIn = ''; UI.calcOut = ''; UI.calcHist = []; UI.cantOpen = {}; UI.name = '';
+    save();
+    dlgOpener = null;
+    closeDlg(document.getElementById('dlgStartOver'));
+    goto(1);
+    announce('Your work was erased. You are back at Step 1.');
+  });
+
+  // ---------- Actions ----------
+  function doAction(a, el) {
+    const id = el.dataset.id, kind = el.dataset.kind;
+    switch (a) {
+      case 'next': goNext(el.dataset.force === '1'); return;
+      case 'back': goto(S.step - 1); return;
+      case 'sources': buildSources(); openDlg('dlgSources'); return;
+      case 'lockPick':
+        if (!S.pick) { setFb('pick', 'no', 'Choose one of the six places first.'); UI.focus = 'btnLock'; break; }
+        if (!S.pickWhy.trim()) { setFb('pick', 'no', 'Write one sentence about why you picked it.'); UI.focus = 'pickWhy'; break; }
+        S.pickLocked = true; delete UI.fb.pick; UI.navWarn = null; UI.focus = 'lockedPick';
+        announce('Your answer is locked in: ' + placeName(S.pick) + '.');
+        break;
+      case 'unlockPick': S.pickLocked = false; UI.focus = 'pick-' + S.pick; break;
+      case 'verifyCheck': {
+        const it = vItem(id), p = L.byId(id);
+        const res = L.checkVerify(it.value, p);
+        if (res.ok) { it.status = 'verified'; it.tries++; delete UI.fb['v-' + id]; UI.focus = 'vres-' + id; announce('Verified. ' + res.msg); }
+        else {
+          if (res.counted) it.tries++;
+          if (it.tries >= 2 && !it.offered) { it.offered = true; }
+          setFb('v-' + id, 'no', res.msg + (it.tries >= 2 && !it.hintOpen ? ' Try “Show me where” for step-by-step help.' : ''));
+          UI.focus = 'vin-' + id;
+        }
+        break;
+      }
+      case 'toggleWhere': { const it = vItem(id); it.hintOpen = !it.hintOpen; UI.focus = 'where-btn-' + id; if (it.hintOpen) announce('Steps to find the number are shown below the buttons.'); break; }
+      case 'cantOpen': UI.cantOpen[id] = true; UI.focus = 'cantbox-' + id; break;
+      case 'reveal': { const it = vItem(id); it.status = 'revealed'; UI.focus = 'vres-' + id; announce('The number is ' + fmt(L.byId(id).count) + '. Your PDF will note you did not check it yourself.'); break; }
+      case 'usNext': S.usShown = Math.min(3, S.usShown + 1); UI.focus = S.usShown >= 3 ? 'ex-check' : 'usNext'; announce('Worked example, step ' + S.usShown + ' shown.'); break;
+      case 'rateCheck': {
+        const it = rItem(id), p = L.byId(id);
+        const res = L.rateAttempt(it.value, p, it.tries);
+        it.tries = res.tries;
+        if (res.ok) {
+          it.status = 'correct'; it.value = String(it.value).trim().replace(/,/g, '');
+          setFb('r-' + id, 'ok', res.msg);
+          const nxt = PLACES.find(function (q) { return rItem(q.id).status === 'open'; });
+          UI.focus = nxt ? 'rin-' + nxt.id : 'rres-' + id;
+          if (allRatesResolved()) announce('All six rates are done. Chart 2 is now open in Part B.');
+        } else {
+          setFb('r-' + id, 'no', res.msg + (res.canReveal ? ' You can also press “Show me the answer” and keep going.' : ''));
+          UI.focus = 'rin-' + id;
+        }
+        break;
+      }
+      case 'rateReveal': {
+        const it = rItem(id); it.status = 'revealed';
+        setFb('r-' + id, 'info', 'The rate for ' + placeName(id) + ' is about ' + fmt(studentRate(id), 1) + ' per 10,000. Look at the set-up: ' + fmt(L.byId(id).count) + ' ÷ ' + fmt(L.byId(id).pop) + ' × 10,000.');
+        UI.focus = 'rres-' + id;
+        break;
+      }
+      case 'calc': {
+        const inp = document.getElementById('calc-in');
+        UI.calcIn = inp ? inp.value : UI.calcIn;
+        try { const v = L.calcEval(UI.calcIn); UI.calcOut = '= ' + L.formatCalc(v); UI.calcHist.unshift(UI.calcIn.trim() + ' = ' + L.formatCalc(v)); UI.calcHist = UI.calcHist.slice(0, 5); }
+        catch (e) { UI.calcOut = e.message; }
+        announce(UI.calcOut);
+        UI.focus = 'calc-in';
+        break;
+      }
+      case 'calcClear': UI.calcIn = ''; UI.calcOut = ''; UI.focus = 'calc-in'; break;
+      case 'setScale': {
+        const C = S.charts[kind];
+        const res = L.validateScale(C.maxIn, C.stepIn, dataMax(kind));
+        if (!res.ok) { C.scaleTries++; setFb('scale-' + kind, 'no', res.msg); UI.focus = 'cb-' + kind + '-max'; }
+        else {
+          C.scale = { max: res.max, st: res.st, n: res.n };
+          Object.keys(C.bars).forEach(function (k) { C.bars[k] = Math.min(C.bars[k], res.max); });
+          C.lastCheck = null;
+          if (C.status === 'done') C.status = 'open';
+          setFb('scale-' + kind, res.note ? 'info' : 'done', 'Scale set: 0 to ' + fmt(res.max, 3) + ', with a label every ' + fmt(res.st, 3) + '. ' + res.note, res.note ? 'Scale set.' : FB_LABEL.done);
+          UI.focus = 'cb-' + kind + '-hit-' + PLACES[0].id;
+        }
+        break;
+      }
+      case 'useSuggested': {
+        const C = S.charts[kind], ns = L.niceScale(dataMax(kind));
+        C.maxIn = String(ns.max); C.stepIn = String(ns.st);
+        const res = L.validateScale(C.maxIn, C.stepIn, dataMax(kind));
+        if (res.ok) { C.scale = { max: res.max, st: res.st, n: res.n }; setFb('scale-' + kind, 'done', 'Scale set: 0 to ' + fmt(res.max, 3) + ', with a label every ' + fmt(res.st, 3) + '.'); }
+        UI.focus = 'cb-' + kind + '-hit-' + PLACES[0].id;
+        break;
+      }
+      case 'checkChart': checkChart(kind); break;
+      case 'fillBars': {
+        const C = S.charts[kind];
+        if (!C.scale) { setFb('chart-' + kind, 'no', 'Set the scale first.'); break; }
+        PLACES.forEach(function (p) { C.bars[p.id] = Math.min(C.scale.max, tableValue(kind, p.id)); });
+        C.filled = true; C.lastCheck = null;
+        setFb('chart-' + kind, 'info', 'The bars are now set to your table values. Your PDF will note that the tool set the bar heights. Press “Check my chart” to finish.');
+        UI.focus = 'cb-' + kind + '-check';
+        break;
+      }
+      case 'readCaveats': S.readCaveats = true; UI.focus = 'ans-q3'; break;
+      case 'savePdf': {
+        const ni = document.getElementById('studentName');
+        UI.name = ni ? ni.value : UI.name;
+        if (!UI.name.trim()) { setFb('save', 'no', 'Type your name first.'); UI.focus = 'studentName'; break; }
+        delete UI.fb.save;
+        buildReport();
+        try { window.print(); }
+        catch (e) { setFb('save', 'no', 'This page could not open the print window. Open this page in its own browser tab and try again.'); render(); }
+        return;
+      }
+      default: return;
+    }
+    save(); render();
+  }
+  function checkChart(kind) {
+    const C = S.charts[kind], issues = [];
+    if (!C.scale) issues.push('Set the scale for the vertical axis.');
+    if (!C.title.trim()) issues.push('Give your chart a title.');
+    if (!C.ylabel.trim()) issues.push('Label the vertical axis (what the bar heights mean).');
+    else if (kind === 'rate' && !/per\s*10[,.\s]?000/i.test(C.ylabel)) issues.push('Your vertical axis label should say the rate is “per 10,000” people.');
+    if (!C.xlabel.trim()) issues.push('Label the horizontal axis (what each bar stands for).');
+    let barsOk = false;
+    if (C.scale) {
+      const targets = {}; PLACES.forEach(function (p) { targets[p.id] = tableValue(kind, p.id); });
+      const res = L.checkBars(C.bars, targets, C.scale.max);
+      C.lastCheck = {};
+      res.results.forEach(function (r) {
+        C.lastCheck[r.id] = r.state;
+        const nm = L.byId(r.id).short;
+        if (r.state === 'unset') issues.push(nm + ': this bar is not set yet. Your table says ' + valText(kind, r.t) + '.');
+        else if (r.state !== 'ok') issues.push(nm + ': your bar is at ' + valText(kind, r.v) + ', but your table says ' + valText(kind, r.t) + ' (too ' + (r.state === 'high' ? 'high' : 'low') + ').');
+      });
+      barsOk = res.allOk;
+    }
+    if (!issues.length && barsOk) {
+      C.status = 'done';
+      setFb('chart-' + kind, 'done', 'Your chart matches your table and is fully labeled.' + (S.charts.count.status === 'done' && S.charts.rate.status === 'done' ? ' Both charts are now shown side by side below.' : ''));
+    } else {
+      C.checks++;
+      setFb('chart-' + kind, 'no', 'Fix these: ' + issues.join(' '));
+    }
+    UI.focus = 'cb-' + kind + '-check';
+  }
+
+  // ---------- Event wiring ----------
+  main.addEventListener('click', function (e) {
+    const el = e.target.closest('[data-action]');
+    if (el && main.contains(el)) doAction(el.dataset.action, el);
+  });
+  main.addEventListener('input', function (e) {
+    const t = e.target;
+    if (t.dataset.bind) {
+      setPath(S, t.dataset.bind, t.value);
+      if (t.dataset.svg) {
+        const s = document.getElementById(t.dataset.svg);
+        const ph = { t: '(Your chart title)', y: '(vertical axis label)', x: '(horizontal axis label)' }[t.dataset.svg.slice(-1)];
+        if (s) s.textContent = t.value || ph;
+      }
+      save();
+      if (/^ans\.|^pickWhy/.test(t.dataset.bind)) renderNav();
+    } else if (t.dataset.vin) { vItem(t.dataset.vin).value = t.value; save(); }
+    else if (t.dataset.rin) { rItem(t.dataset.rin).value = t.value; save(); }
+    else if (t.dataset.barKind) {
+      const kind = t.dataset.barKind, id = t.dataset.barId, C = S.charts[kind];
+      if (!t.value.trim()) { C.bars[id] = 0; setBar(kind, id, 0, 'type'); return; }
+      const v = L.parseNum(t.value);
+      const fbEl = document.getElementById('fb-barin-' + kind);
+      if (isNaN(v)) { if (fbEl) { fbEl.className = 'fb fb-no'; fbEl.textContent = '✗ Type a number for the ' + L.byId(id).short + ' bar.'; } return; }
+      if (C.scale && v > C.scale.max) { if (fbEl) { fbEl.className = 'fb fb-no'; fbEl.textContent = '✗ ' + fmt(v) + ' is above your axis maximum (' + fmt(C.scale.max) + '). Check the number, or make the axis taller.'; } }
+      else if (fbEl) { fbEl.className = 'fb'; fbEl.textContent = ''; }
+      setBar(kind, id, v, 'type');
+    } else if (t.id === 'calc-in') { UI.calcIn = t.value; }
+    else if (t.dataset.name) { UI.name = t.value; }
+  });
+  main.addEventListener('change', function (e) {
+    const t = e.target;
+    if (t.name === 'pick' && !S.pickLocked) { S.pick = t.value; save(); }
+    else if (t.name === 'second') {
+      if (S.second !== t.value) {
+        if (S.second && S.verify[S.second] && S.verify[S.second].status === 'open') delete S.verify[S.second];
+        S.second = t.value; startTimers(); UI.navWarn = null; UI.focus = 'second-' + t.value;
+        save(); render();
+        announce(placeName(t.value) + ' is now hidden in the table. Find it in the HUD report.');
+      }
+    } else if (t.dataset.check === 'r2skip') {
+      S.ans.r2skip = t.checked; UI.focus = 'r2skip'; save(); render();
+      announce(t.checked ? 'You chose not to share this one. That is fine.' : 'The answer box is open again.');
+    }
+  });
+  main.addEventListener('keydown', function (e) {
+    const t = e.target;
+    if (e.key === 'Enter' && t.dataset && t.dataset.enter && t.tagName === 'INPUT') {
+      e.preventDefault();
+      doAction(t.dataset.enter, t);
+      return;
+    }
+    if (t.classList && t.classList.contains('hit')) {
+      const kind = t.dataset.kind, id = t.dataset.id, C = S.charts[kind], sc = C.scale;
+      if (!sc) return;
+      const inc = L.barInc(sc.max), v = C.bars[id] || 0;
+      let nv = null;
+      switch (e.key) {
+        case 'ArrowUp': case 'ArrowRight': nv = e.shiftKey ? v + sc.st : Math.round((v + inc) / inc) * inc; break;
+        case 'ArrowDown': case 'ArrowLeft': nv = e.shiftKey ? v - sc.st : Math.round((v - inc) / inc) * inc; break;
+        case 'PageUp': nv = v + sc.st; break;
+        case 'PageDown': nv = v - sc.st; break;
+        case 'Home': nv = 0; break;
+        case 'End': nv = sc.max; break;
+      }
+      if (nv !== null) { e.preventDefault(); setBar(kind, id, nv, 'key'); }
+    }
+  });
+  let drag = null;
+  function dragTo(e) {
+    const svg = drag.el.ownerSVGElement, ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const loc = pt.matrixTransform(ctm.inverse());
+    const sc = S.charts[drag.kind].scale, inc = L.barInc(sc.max);
+    const v = (G.base - loc.y) / G.ph * sc.max;
+    setBar(drag.kind, drag.id, Math.round(v / inc) * inc, 'drag');
+  }
+  main.addEventListener('pointerdown', function (e) {
+    const hit = e.target.closest && e.target.closest('.hit');
+    if (!hit) return;
+    e.preventDefault();
+    drag = { kind: hit.dataset.kind, id: hit.dataset.id, pid: e.pointerId, el: hit };
+    try { hit.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    hit.focus();
+    dragTo(e);
+  });
+  main.addEventListener('pointermove', function (e) { if (drag && e.pointerId === drag.pid) dragTo(e); });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    const C = S.charts[drag.kind];
+    announce(L.byId(drag.id).short + ' bar set to ' + valText(drag.kind, C.bars[drag.id] || 0) + '.');
+    drag = null; save();
+  }
+  main.addEventListener('pointerup', endDrag);
+  main.addEventListener('pointercancel', endDrag);
+
+  // ---------- Render ----------
+  function updateSaveStatus() {
+    document.getElementById('saveStatus').textContent = storageOK
+      ? 'Your work is kept in this tab until you close it. Save your PDF before you close the tab.'
+      : 'Saving is turned off in this browser, so keep this tab open until you save your PDF.';
+  }
+  function render() {
+    const active = document.activeElement;
+    const fid = UI.focus || (active && active !== document.body && active.id) || null;
+    let sel = null;
+    try { if (!UI.focus && active && typeof active.selectionStart === 'number') sel = active.selectionStart; } catch (e) { sel = null; }
+    UI.focus = null;
+    renderNav();
+    main.innerHTML = [null, renderStep1, renderStep2, renderStep3, renderStep4, renderStep5][S.step]();
+    if (fid) {
+      const el = document.getElementById(fid);
+      if (el) {
+        try { el.focus({ preventScroll: false }); } catch (e) { el.focus(); }
+        if (sel !== null && el.setSelectionRange) { try { el.setSelectionRange(sel, sel); } catch (e) { /* ignore */ } }
+      }
+    }
+    updateSaveStatus();
+  }
+
+  // Hint auto-offer after about 3 minutes on a verification item.
+  setInterval(function () {
+    if (S.step !== 2) return;
+    let changed = false;
+    verifyTargets().forEach(function (id) {
+      const it = vItem(id);
+      if (it.status === 'open' && it.started && !it.offered && Date.now() - it.started >= 180000) {
+        it.offered = true; changed = true;
+        const o = document.getElementById('offer-' + id);
+        if (o && !it.hintOpen) o.hidden = false;
+        announce('Finding the number for ' + placeName(id) + ' is taking a while. The “Show me where” steps can help.');
+      }
+    });
+    if (changed) save();
+  }, 10000);
+
+  if (S.step === 2) startTimers();
+  render();
+})();
+</script>
+</body>
+</html>

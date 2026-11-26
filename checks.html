@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counts vs. Rates: Data Checks</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 900px; margin: 16px auto; padding: 0 16px; background: #f5f6f8; color: #1b2430; line-height: 1.45; }
+  h1 { font-size: 1.3rem; }
+  .pass { color: #1b6436; } .fail { color: #8a3110; font-weight: 700; }
+  #summary { font-weight: 700; font-size: 1.1rem; }
+  iframe { width: 100%; height: 280px; border: 1px solid #8b95a3; background: #fff; }
+  li { margin: 2px 0; }
+</style>
+</head>
+<body>
+<h1>Counts vs. Rates: Data Checks</h1>
+<p>This page checks that every number in the lesson matches <code>sources.md</code> (Data set 4, table 4a), the record of each figure and where it was found. It also checks that the answer key in <code>lesson-plan.md</code> follows from those numbers, and that the lesson's rate checker accepts right answers and rejects wrong ones. Open it from the live site or a local web server, not as a file, so it can read the other files.</p>
+<div id="summary" role="status">Running...</div>
+<ol id="results"></ol>
+<iframe id="tool" src="index.html" title="The lesson being checked"></iframe>
+<script>
+(function () {
+  'use strict';
+  var results = [], fails = 0;
+  function check(name, ok, detail) { results.push([name, !!ok, detail || '']); if (!ok) fails++; }
+  function num(s) { return parseFloat(String(s).replace(/[,*\s]/g, '')); }
+  function cells(line) { return line.split('|').slice(1, -1).map(function (c) { return c.trim(); }); }
+  function fmt(n) { return n.toLocaleString('en-US'); }
+
+  function run(L, doc, sources, plan) {
+    var lines = sources.split(/\r?\n/);
+    var start = lines.findIndex(function (l) { return /^### 4a\./.test(l); });
+    var table = lines.slice(start).filter(function (l) { return /^\|/.test(l); }).slice(0, 18);
+
+    // 1. Every place's numbers match its row in sources.md table 4a.
+    L.PLACES.forEach(function (p) {
+      var row = table.find(function (l) { return l.indexOf('| ' + p.coc + ' ') === 0; });
+      if (!row) { check(p.name + ': row found in sources.md', false, p.coc); return; }
+      var c = cells(row);
+      check(p.name + ': CoC name "' + c[0] + '"', c[0] === p.cocName);
+      check(p.name + ': PIT date ' + c[1], c[1] === p.pitDate, 'lesson has ' + p.pitDate);
+      check(p.name + ': emergency shelter ' + c[2], num(c[2]) === p.es, 'lesson has ' + fmt(p.es));
+      check(p.name + ': transitional housing ' + c[3], num(c[3]) === p.th, 'lesson has ' + fmt(p.th));
+      check(p.name + ': unsheltered ' + c[4], num(c[4]) === p.un, 'lesson has ' + fmt(p.un));
+      check(p.name + ': total ' + c[5], num(c[5]) === p.count, 'lesson has ' + fmt(p.count));
+      check(p.name + ': population ' + c[7], num(c[7]) === p.pop, 'lesson has ' + fmt(p.pop));
+      check(p.name + ': shelter + transitional + unsheltered = total', p.es + p.th + p.un === p.count);
+      check(p.name + ': links to its own HUD report', p.pdf === 'https://files.hudexchange.info/reports/published/CoC_PopSub_CoC_' + p.coc + '-2024_' + p.st + '_2024.pdf', p.pdf);
+    });
+    var usRow = cells(table.find(function (l) { return /United States/.test(l); }));
+    [['emergency shelter', 2, 'es'], ['transitional housing', 3, 'th'], ['unsheltered', 4, 'un'], ['total', 5, 'count'], ['population', 7, 'pop']].forEach(function (k) {
+      check('United States: ' + k[0] + ' ' + usRow[k[1]], num(usRow[k[1]]) === L.US[k[2]], 'lesson has ' + fmt(L.US[k[2]]));
+    });
+    check('United States: shelter + transitional + unsheltered = total', L.US.es + L.US.th + L.US.un === L.US.count);
+
+    // 2. The answer key in lesson-plan.md follows from those numbers.
+    var key = plan.split(/\r?\n/).filter(function (l) { return /^\| .* x 10,000 = /.test(l); });
+    var all = L.PLACES.concat([L.US]);
+    all.forEach(function (p) {
+      var row = key.find(function (l) { var n = cells(l)[0].replace(/\*/g, ''); return p === L.US ? /United States/.test(n) : n.indexOf(p.short) === 0; });
+      if (!row) { check(p.name + ': answer-key row found', false); return; }
+      var c = cells(row), r = p.count / p.pop * 10000;
+      var setUp = c[3].match(/= ([\d.]+)$/), oneDec = c[4].match(/([\d.]+)/);
+      check(p.name + ': answer key uses ' + c[1] + ' and ' + c[2], num(c[1]) === p.count && num(c[2]) === p.pop);
+      check(p.name + ': set-up ' + c[3], setUp && Math.abs(num(setUp[1]) - r) <= 0.005, r.toFixed(4));
+      check(p.name + ': rate ' + oneDec[1] + ' per 10,000', Math.abs(num(oneDec[1]) - r) <= 0.05, r.toFixed(4));
+      check(p.name + ': the lesson accepts the exact rate and ' + oneDec[1], L.checkRate(r, p) && L.checkRate(num(oneDec[1]), p));
+      check(p.name + ': the lesson rejects a rate 0.6 off', !L.checkRate(r + 0.6, p) && !L.checkRate(r - 0.6, p));
+      if (p !== L.US) {
+        check(p.name + ': forgetting × 10,000 is named', L.diagnoseRate(p.count / p.pop, p.count, p.pop) === 'noScale');
+        check(p.name + ': dividing upside down is named', L.diagnoseRate(p.pop / p.count * 10000, p.count, p.pop) === 'flipped');
+      }
+    });
+    function order(label) {
+      var line = plan.split(/\r?\n/).find(function (l) { return l.indexOf(label) >= 0; });
+      return (line.match(/\d ([A-Za-z ]+) \(/g) || []).map(function (m) { return m.replace(/^\d /, '').replace(/ \($/, ''); });
+    }
+    var byCount = L.PLACES.slice().sort(function (a, b) { return b.count - a.count; }).map(function (p) { return p.short; });
+    var byRate = L.PLACES.slice().sort(function (a, b) { return b.count / b.pop - a.count / a.pop; }).map(function (p) { return p.short; });
+    check('Answer key: ranking by raw count', order('Ranking by raw count').join(', ') === byCount.join(', '), byCount.join(', '));
+    check('Answer key: ranking by rate', order('Ranking by rate').join(', ') === byRate.join(', '), byRate.join(', '));
+    var usRate = L.US.count / L.US.pop * 10000;
+    check('United States: 22.7 per 10,000 rounds to HUD\'s "about 23"', Math.round(usRate) === 23 && /about 23 of every 10,000/.test(sources), usRate.toFixed(4));
+
+    // 3. Privacy: the lesson loads nothing from outside and keeps work only in its own tab.
+    var html = doc.documentElement.outerHTML;
+    ['<link', '@import', 'fetch(', 'XMLHttpRequest', 'sendBeacon', 'localStorage', 'indexedDB', 'document.cookie'].forEach(function (bad) {
+      check('Privacy: no "' + bad + '"', html.indexOf(bad) < 0);
+    });
+    check('Privacy: no file loads from another site', !/(src|href)=["']https?:[^"']*\.(js|css|woff2?|png|jpg|svg)["']/.test(html.replace(/<a [^>]*>/g, '')));
+    check('Privacy: work is kept only in this tab', html.indexOf('sessionStorage') >= 0 && /kept only in this tab/.test(doc.body.textContent));
+
+    show();
+  }
+
+  function show() {
+    var list = document.getElementById('results');
+    results.forEach(function (r) {
+      var li = document.createElement('li'); li.className = r[1] ? 'pass' : 'fail';
+      li.textContent = (r[1] ? '✓ ' : '✗ ') + r[0] + (r[2] ? '  (' + r[2] + ')' : '');
+      list.appendChild(li);
+    });
+    document.getElementById('summary').textContent = (results.length - fails) + ' of ' + results.length + ' passed' + (fails ? '. ' + fails + ' failed.' : '.');
+  }
+
+  var frame = document.getElementById('tool');
+  frame.addEventListener('load', function () {
+    Promise.all(['sources.md', 'lesson-plan.md'].map(function (f) { return fetch(f).then(function (r) { if (!r.ok) throw new Error(f + ' not found'); return r.text(); }); }))
+      .then(function (t) { run(frame.contentWindow.L01, frame.contentDocument, t[0], t[1]); })
+      .catch(function (e) { check('The checks could run', false, e.message + ' (open this page from a web server, not as a file)'); show(); });
+  });
+})();
+</script>
+</body>
+</html>
